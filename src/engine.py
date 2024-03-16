@@ -24,13 +24,12 @@ class Engine:
         pygame.init()
         self.state: GameState = GameState.MENU
         self.level: Union[None, int] = None
+        self.clock = pygame.time.Clock()
 
     def run(self):
-        clock = pygame.time.Clock()
-
         running = True
         while running:
-            clock.tick(FPS)
+            self.clock.tick(FPS)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
