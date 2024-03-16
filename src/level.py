@@ -18,6 +18,4 @@ class Level:
 
         # manage txt and then remove the following line
         raise NotImplemented()
-    
-    def 
 
