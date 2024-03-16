@@ -3,7 +3,7 @@ from typing import Union
 
 # pygame libraries management
 import pygame
-from pygame.tranfrom pygame.transform import scale, rotate
+from pygame.transform import scale, rotate
 from pygame.image import load
 from pygame.locals import *
 from pygame import display
