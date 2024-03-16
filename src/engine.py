@@ -2,15 +2,15 @@ from enum import Enum
 from typing import Union
 
 # pygame libraries management
+import level
+import player
+from game_constants import FPS
 import pygame
 from pygame.transform import scale, rotate
 from pygame.image import load
 from pygame.locals import *
 from pygame import display
 
-BG_COLOR = (255, 255, 255)
-WIDTH, HEIGHT = 1000, 800
-FPS = 60
 
 class GameState(Enum):
     MENU = 0
@@ -24,13 +24,13 @@ class Engine:
         pygame.init()
         self.state: GameState = GameState.MENU
         self.level: Union[None, int] = None
+        self.clock = pygame.time.Clock()
 
     def run(self):
-        clock = pygame.time.Clock()
 
         running = True
         while running:
-            clock.tick(FPS)
+            self.clock.tick(FPS)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

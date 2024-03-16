@@ -1,5 +1,8 @@
 from enum import Enum
-
+import pygame
+import os
+from os.path import isfile, join
+from game_constants import WIDTH, HEIGHT
 
 class Tile(Enum):
     EMPTY = 0
@@ -19,3 +22,18 @@ class Level:
         # manage txt and then remove the following line
         raise NotImplemented()
 
+    def get_background(self, name):
+        image = pygame.image.load(join("assets", "Background", name))
+        _, _, width, height = image.get_rect()
+        tiles = []
+
+        for i in range(WIDTH // width + 1):
+            for j in range(HEIGHT // height + 1):
+                pos = (i * width, j * height)
+                tiles.append(pos)
+
+        return tiles, image
+
+    def draw(self, window, background, bg_image):
+        for tile in background:
+            window.blit(bg_image, )
