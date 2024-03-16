@@ -3,11 +3,14 @@ from typing import Union
 
 # pygame libraries management
 import pygame
-from pygame.tranfrom pygame.transform import scale, rotate
+from pygame.transform import scale, rotate
 from pygame.image import load
 from pygame.locals import *
 from pygame import display
 
+BG_COLOR = (255, 255, 255)
+WIDTH, HEIGHT = 1000, 800
+FPS = 60
 
 class GameState(Enum):
     MENU = 0
@@ -23,11 +26,16 @@ class Engine:
         self.level: Union[None, int] = None
 
     def run(self):
+        clock = pygame.time.Clock()
+
         running = True
         while running:
+            clock.tick(FPS)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                    break
             
             if self.state == GameState.MENU:
                 self.menu()
@@ -35,6 +43,9 @@ class Engine:
                 self.game()
             elif self.state == GameState.OPTIONS:
                 self.options()
+
+        pygame.quit()
+        quit()
 
     def menu(self):
         # Stuff
