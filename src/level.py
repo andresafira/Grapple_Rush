@@ -36,4 +36,6 @@ class Level:
 
     def draw(self, window, background, bg_image):
         for tile in background:
-            window.blit(bg_image, )
+            window.blit(bg_image, tile)
+
+        pygame.display.update()
