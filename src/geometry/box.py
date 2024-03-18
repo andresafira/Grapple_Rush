@@ -25,10 +25,10 @@ class Segment:
         :type other: Segment
         :return: point of intersection if it exists (None otherwise)
         """
-        M = np.array([[self.v.x, -other.v.x], [self.v.y, -other.v.y]])
-        y = np.array([other.base.x - self.base.x, other.base.y - self.base.y])
+        M = array([[self.v.x, -other.v.x], [self.v.y, -other.v.y]])
+        y = array([other.base.x - self.base.x, other.base.y - self.base.y])
         try:
-            x = np.linalg.solve(M, y)
+            x = solve(M, y)
         except:
             # Maybe it would be good to add a case for when the objects are parallel and have infinite intersections
             return None
