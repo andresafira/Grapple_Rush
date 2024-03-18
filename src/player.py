@@ -1,4 +1,4 @@
-from utils import Vector
+from geometry.vector import Vector
 from typing import Union
 from player_constants import *
 from enum import Enum
