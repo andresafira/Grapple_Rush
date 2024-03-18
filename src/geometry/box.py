@@ -8,12 +8,8 @@ class Segment:
         self.v = P2 - P1
         self.base = P1
 
-    def evaluate(self, t):
+    def evaluate(self, t: float) -> Vector:
         """ Method that calculates the interpolation between P1 and P2 for a given scalar t (t must be between 0 and 1)
-        :param t: parametric parameter
-        :type t: float
-        :return: interpolated point
-        :rtype: Vector
         """
         if t < 0.0 or t > 1.0:
             raise Exception("t argument must be a number between 0.0 and 1.0")
@@ -77,11 +73,4 @@ class Box:
             return self.check_collision_segment(objects) is not None
         if type(objects) is Box:
             return self.check_collision_box(objects)
-        if type(objects) is not list and type(objects) is not tuple:
-            raise TypeError('Invalid input type')
-        for obj in objects:
-            if (type(obj) is Segment) and (self.check_collision_segment(obj) is not None):
-                return True
-            elif (type(obj) is Box) and (self.check_collision_box(obj)):
-                return True
-        return False
+        raise TypeError('Invalid input type')
