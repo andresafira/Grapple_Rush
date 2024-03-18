@@ -2,7 +2,8 @@ from enum import Enum
 import pygame
 import os
 from os.path import isfile, join
-from game_constants import WIDTH, HEIGHT
+from constants.game_constants import WIDTH, HEIGHT
+
 
 class Tile(Enum):
     EMPTY = 0
