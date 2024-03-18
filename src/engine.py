@@ -31,8 +31,6 @@ class Engine:
         self.clock = pygame.time.Clock()
 
     def run(self):
-        # background, bg_image = get_background("exemplo.png")
-        # no caso, vai ter backgrounds diferentes, precisa adicionar a lógica de escolher qual.
         running = True
         while running:
             self.clock.tick(FPS)
