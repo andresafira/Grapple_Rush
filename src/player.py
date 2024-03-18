@@ -17,7 +17,7 @@ class Player:
         self.jumping: bool = False
         self.jump_pressing_ended: bool = False
 
-    def move_without_gh(self, horizontal_movement: str,
+    def update_velocity(self, horizontal_movement: str,
                               jump_pressed: bool):
         # Horizontal movement
         if horizontal_movement == 'left':
@@ -49,8 +49,6 @@ class Player:
             acc_y *= FALL_G_MULTIPLIER
 
         self.velocity.y += acc_y * self.dt
-
-        # Check for collisions
-
-        self.position += self.velocity * self.dt
-
+    
+    def move(self):
+        self.position += self.velocity
