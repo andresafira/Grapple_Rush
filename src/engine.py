@@ -2,15 +2,19 @@ from enum import Enum
 from typing import Union
 
 # pygame libraries management
+import level
+import player
+from game_constants import FPS, WIDTH, HEIGHT
 import pygame
 from pygame.transform import scale, rotate
 from pygame.image import load
 from pygame.locals import *
 from pygame import display
 
-BG_COLOR = (255, 255, 255)
-WIDTH, HEIGHT = 1000, 800
-FPS = 60
+pygame.init()
+pygame.display.set_caption("Grapple Rush")
+
+window = pygame.display.set_mode((WIDTH, HEIGHT))
 
 class GameState(Enum):
     MENU = 0
@@ -63,3 +67,4 @@ class Engine:
         # if choose == menu -> self.state = GameState.Menu
         raise NotImplemented()
 
+    
