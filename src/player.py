@@ -1,19 +1,14 @@
 from geometry.vector import Vector
+from constans.player_constants import *
+from constants.game_constants import FPS
 from typing import Union
-from player_constants import *
-from enum import Enum
-
-
-class HorizontalMovement(Enum):
-    LEFT = -1
-    NONE = 0
-    RIGHT = 1
 
 
 class Player:
     def __init__(self, initial_pos: Vector):
         self.position: Vector = initial_pos
         self.velocity: Vector = Vector(0, 0)
+        self.dt = 1 / FPS;
         self.alive: bool = True
 
         self.gh_position: Union[None, Vector] = None
@@ -22,22 +17,18 @@ class Player:
         self.jumping: bool = False
         self.jump_pressing_ended: bool = False
 
-    def move_without_gh(self, horizontal_movement: HorizontalMovement,
+    def move_without_gh(self, horizontal_movement: str,
                               jump_pressed: bool):
-        self.position += self.velocity * 0.01 # ADD *dt when we have a game_constants.py
-        
-        # HERE IS THE DIFFICULT PART, WE HAVE TO ANALYZE COLLISIONS IN ORDER TO CHECK IF THE JUMP ENDED OR IN ORDER TO CLIP THE POSITION TO STOP THE MOVEMENT
-
         # Horizontal movement
-        if horizontal_movement == HorizontalMovement.LEFT:
+        if horizontal_movement == 'left':
             target_speed = -MAX_HORIZONTAL_SPEED
-        elif horizontal_movement == HorizontalMovement.NONE:
+        elif horizontal_movement == 'none':
             target_speed = 0
-        elif horizontal_movement == HorizontalMovement.RIGHT:
+        elif horizontal_movement == 'right':
             target_speed = MAX_HORIZONTAL_SPEED
 
         acc_x = ACC_KP * (target_speed - self.velocity.x)
-        self.velocity.x += acc_x * 0.01 # ADD *dt when we have a game_constants.py
+        self.velocity.x += acc_x * self.dt
 
         # Vertical movement
         acc_y = BASE_G_VALUE
@@ -47,13 +38,19 @@ class Player:
                 self.jump_pressing_ended = False
                 self.velocity.y = MAX_JUMP_SPEED
             if not self.jump_pressing_ended and self.velocity.y >= 0:
+                # if the character is jumping for the first time and has positive velocity, the gravity becomes
+                # smaller so that the player can control the jump height
                 acc_y *= JUMP_G_CONTROL
         else:
             self.jump_pressing_ended = True
 
         if self.velocity.y < 0:
+            # if the player is falling the gravity increases, in order to decrease fall time (enhancing control)
             acc_y *= FALL_G_MULTIPLIER
 
-        self.velocity.y += acc_y * 0.01 # ADD *dt when we have a game_constants.py
+        self.velocity.y += acc_y * self.dt
 
+        # Check for collisions
+
+        self.position += self.velocity * self.dt
 
