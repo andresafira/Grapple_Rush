@@ -1,8 +1,7 @@
 from enum import Enum
-import pygame
-import os
-from os.path import isfile, join
-from constants.game_constants import WIDTH, HEIGHT
+from player import Player
+from constants.game_constants import TILE_HEIGHT, TILE_WIDTH, FPS
+import json
 
 
 class Tile(Enum):
@@ -13,30 +12,39 @@ class Tile(Enum):
 
 
 class Level:
-    def __init__(self, height_in_tiles: int, width_in_tiles: int):
-        self.map = [[Tile.EMPTY for _ in range(width_in_tiles)] for __ in range(height_in_tiles)]
+    def __init__(self):
+        self.map: list[list[Tile]] = [[]]
 
-    def create_from_txt(self, path: str):
-        with open(path, 'r') as file:
-            txt = file.read()
+    def create_from(self, path: str):
+        with open(path, 'rb') as file:
+            self.map = json.load(file)
+    
+    def is_valid(self, i, j):
+        if i < 0 or i >= len(self.map) or j < 0 or j >= len(self.map[0]):
+            return False
+        return True
 
-        # manage txt and then remove the following line
-        raise NotImplemented()
+    def simulate_move(self, player: Player):
+        next_pos = player.position + player.velocity / FPS
+        
+        # Assuming the player is in a valid square, we only have to look for the direction
+        # it is moving to determine if a collision is going to happen
+        x_increment = 0
+        if player.velocity.x > 0:
+            x_increment = player.width
 
-    def get_background(self, name):
-        image = pygame.image.load(join("assets", "Background", name))
-        _, _, width, height = image.get_rect()
-        tiles = []
+        y_increment = 0
+        if player.velocity.y < 0:
+            y_increment = -player.height
 
-        for i in range(WIDTH // width + 1):
-            for j in range(HEIGHT // height + 1):
-                pos = (i * width, j * height)
-                tiles.append(pos)
-
-        return tiles, image
-
-    def draw(self, window, background, bg_image):
-        for tile in background:
-            window.blit(bg_image, tile)
-
-        pygame.display.update()
+        i_next = int(next_pos.y + y_increment / TILE_HEIGHT)
+        j_next = int(next_pos.x + x_increment / TILE_WIDTH)
+        if not self.is_valid(i_next, j_next) or self.map[i_next][j_next] != Tile.EMPTY:
+            i_current = int(player.position.y + x_increment / TILE_HEIGHT)
+            j_current = int(player.position.x + y_increment / TILE_WIDTH)
+            if i_next != i_current:
+                player.velocity.y = 0
+            if j_next != j_current:
+                player.velocity.x = 0
+            # If the player is with the GH attached and collide with something,
+            # maybe we can detach it, or other action
