@@ -5,11 +5,13 @@ from typing import Union
 
 
 class Player:
-    def __init__(self, initial_pos: Vector):
+    def __init__(self, initial_pos: Vector, height: float, width: float):
         self.position: Vector = initial_pos
         self.velocity: Vector = Vector(0, 0)
         self.dt = 1 / FPS;
         self.alive: bool = True
+        self.height = height
+        self.width = width
 
         self.gh_position: Union[None, Vector] = None
         self.gh_attached: bool = False
@@ -51,4 +53,4 @@ class Player:
         self.velocity.y += acc_y * self.dt
     
     def move(self):
-        self.position += self.velocity
+        self.position += self.velocity * self.dt
