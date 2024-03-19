@@ -1,6 +1,6 @@
 from enum import Enum
 from player import Player
-from constants.game_constants import TILE_HEIGHT, TILE_WIDTH, FPS
+from constants.game_constants import TILE_HEIGHT, TILE_WIDTH, FPS, LEVELS_PATH, N_LEVELS
 import json
 
 
@@ -15,8 +15,13 @@ class Level:
     def __init__(self):
         self.map: list[list[Tile]] = [[]]
 
-    def create_from(self, path: str):
-        with open(path, 'rb') as file:
+    def create_from(self, level_number: int):
+        if level_number < 0 or level_number > N_LEVELS:
+            raise Exception('Invalid level number: {}'.format(level_number))
+        
+        level_path = LEVELS_PATH + f'l{level_number}.json'
+        
+        with open(level_path, 'rb') as file:
             self.map = json.load(file)
     
     def is_valid(self, i, j):
