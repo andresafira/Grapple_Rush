@@ -30,7 +30,7 @@ class Level:
         return True
 
     def simulate_move(self, player: Player):
-        next_pos = player.position + player.velocity / FPS
+        next_pos = player.position + player.velocity * player.dt
         
         # Assuming the player is in a valid square, we only have to look for the direction
         # it is moving to determine if a collision is going to happen
@@ -45,8 +45,8 @@ class Level:
         i_next = int(next_pos.y + y_increment / TILE_HEIGHT)
         j_next = int(next_pos.x + x_increment / TILE_WIDTH)
         if not self.is_valid(i_next, j_next) or self.map[i_next][j_next] != Tile.EMPTY:
-            i_current = int(player.position.y + x_increment / TILE_HEIGHT)
-            j_current = int(player.position.x + y_increment / TILE_WIDTH)
+            i_current = int(player.position.y + y_increment / TILE_HEIGHT)
+            j_current = int(player.position.x + x_increment / TILE_WIDTH)
             if i_next != i_current:
                 player.velocity.y = 0
             if j_next != j_current:
