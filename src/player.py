@@ -1,12 +1,13 @@
 from geometry.vector import Vector
-from constans.player_constants import *
+from constants.player_constants import *
 from constants.game_constants import FPS
 from typing import Union
+import pygame
 
 
 class Player:
-    def __init__(self, initial_pos: Vector, height: float, width: float):
-        self.position: Vector = initial_pos
+    def __init__(self, x: float, y: float, width: float, height: float):
+        self.position: Vector = Vector(x, y)
         self.velocity: Vector = Vector(0, 0)
         self.dt = 1 / FPS;
         self.alive: bool = True
@@ -16,7 +17,7 @@ class Player:
         self.gh_position: Union[None, Vector] = None
         self.gh_attached: bool = False
 
-        self.jumping: bool = False
+        self.jumping: bool = True
         self.jump_pressing_ended: bool = False
 
     def update_velocity(self, horizontal_movement: str,
@@ -39,7 +40,7 @@ class Player:
                 self.jumping = True
                 self.jump_pressing_ended = False
                 self.velocity.y = MAX_JUMP_SPEED
-            if not self.jump_pressing_ended and self.velocity.y >= 0:
+            if not self.jump_pressing_ended and self.velocity.y > 1:
                 # if the character is jumping for the first time and has positive velocity, the gravity becomes
                 # smaller so that the player can control the jump height
                 acc_y *= JUMP_G_CONTROL
@@ -53,4 +54,9 @@ class Player:
         self.velocity.y += acc_y * self.dt
     
     def move(self):
-        self.position += self.velocity * self.dt
+        self.position = self.position + self.velocity * self.dt
+
+    def draw(self, screen, anchor_point):
+        _, _, _, screen_height = screen.get_rect()
+        pygame.draw.rect(screen, (255, 0, 0),
+                (self.position.x, screen_height - self.position.y, self.width, self.height))

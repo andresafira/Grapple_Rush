@@ -1,20 +1,17 @@
 from enum import Enum
 from typing import Union
 
+from level import Level
+from player import Player
+from constants.game_constants import FPS, WIDTH, HEIGHT
+
 # pygame libraries management
-import level
-import player
-from game_constants import FPS, WIDTH, HEIGHT
 import pygame
 from pygame.transform import scale, rotate
 from pygame.image import load
 from pygame.locals import *
 from pygame import display
 
-pygame.init()
-pygame.display.set_caption("Grapple Rush")
-
-window = pygame.display.set_mode((WIDTH, HEIGHT))
 
 class GameState(Enum):
     MENU = 0
@@ -26,15 +23,21 @@ class GameState(Enum):
 class Engine:
     def __init__(self):
         pygame.init()
-        self.state: GameState = GameState.MENU
-        self.level: Union[None, int] = None
+        pygame.display.set_caption("Grappler Rush")
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+        self.state: GameState = GameState.GAME
+        self.level: Union[None, Level] = Level()
         self.clock = pygame.time.Clock()
+        
+        self.level.create(level_number = 1)
+        self.player: Union[None, Player] = Player(10, HEIGHT - 10, 20, 40)
 
     def run(self):
         running = True
         while running:
             self.clock.tick(FPS)
-
+            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -46,9 +49,21 @@ class Engine:
                 self.game()
             elif self.state == GameState.OPTIONS:
                 self.options()
+            else:
+                raise Exception(f"Invalid Game State: {self.state}")
 
         pygame.quit()
-        quit()
+    
+    def draw_background(self):
+        self.screen.fill((0, 0, 0))
+
+    def draw_game(self):
+        self.draw_background()
+        self.level.draw(self.screen, (0, 0))
+        self.player.draw(self.screen, (0, 0))
+        # draw GH
+
+        pygame.display.update()
 
     def menu(self):
         # Stuff
@@ -58,8 +73,24 @@ class Engine:
         raise NotImplemented()
 
     def game(self):
-        # Run the game
-        raise NotImplemented()
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_d]:
+            horizontal_movement = 'right'
+        elif keys[pygame.K_a]:
+            horizontal_movement = 'left'
+        else:
+            horizontal_movement = 'none'
+
+        if keys[pygame.K_w]:
+            jump = True
+        else:
+            jump = False
+
+        self.player.update_velocity(horizontal_movement, jump)
+        self.level.simulate_move(self.player)
+        self.player.move()
+
+        self.draw_game()
     
     def options(self):
         # Stuff
