@@ -39,7 +39,7 @@ class Engine:
             self.clock.tick(FPS)
             
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT or pygame.key.get_pressed()[K_ESCAPE]:
                     running = False
                     break
             
@@ -74,14 +74,15 @@ class Engine:
 
     def game(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_d]:
+        horizontal_movement = 'none'
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             horizontal_movement = 'right'
-        elif keys[pygame.K_a]:
+        elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
             horizontal_movement = 'left'
         else:
             horizontal_movement = 'none'
 
-        if keys[pygame.K_w]:
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
             jump = True
         else:
             jump = False
