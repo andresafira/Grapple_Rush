@@ -72,8 +72,8 @@ class Level:
     def simulate_move(self, player: Player):
         keep_Xspeed, keep_Yspeed = True, True
         new_x, new_y = None, None
-        for x in (1, 0.5, 0):
-            for y in (1, 0.5, 0):
+        for x in (0, 0.25, 0.5, 0.75, 1):
+            for y in (0, 0.25, 0.5, 0.75, 1):
                 if (not keep_Yspeed and not keep_Xspeed):
                     continue
                 xkeep, ykeep, xnew, ynew = self.simulate_move_corner(player, x, y)
