@@ -82,7 +82,7 @@ class Engine:
         else:
             horizontal_movement = 'none'
 
-        if keys[pygame.K_w] or keys[pygame.K_UP]:
+        if keys[pygame.K_w] or keys[pygame.K_UP] or keys[pygame.K_c]:
             jump = True
         else:
             jump = False
