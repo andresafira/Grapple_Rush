@@ -84,10 +84,10 @@ class Level:
                     new_x = xnew - x * player.width
                 if ynew is not None:
                     new_y = ynew + y * player.height
-        #if new_x is not None:
-        #   player.position.x = new_x
-        #if new_y is not None:
-        #   player.position.y = new_y
+        if new_x is not None:
+           player.position.x = new_x
+        if new_y is not None:
+           player.position.y = new_y
         
         if not keep_Xspeed:
             player.velocity.x = 0
