@@ -1,9 +1,9 @@
-WIDTH, HEIGHT = 1000, 600
-FPS = 40
+WIDTH, HEIGHT = 1500, 900
+FPS = 60
 
 # Tiles Constants
-TILE_HEIGHT = 20
-TILE_WIDTH = 20
+TILE_HEIGHT = 30
+TILE_WIDTH = 30
 
 # Levels path
 LEVELS_PATH: str = "levels/"
