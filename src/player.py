@@ -37,7 +37,7 @@ class Player:
         # Vertical movement
         acc_y = BASE_G_VALUE
         if jump_pressed:
-            if not self.jumping and fabs(self.velocity.y) < 1:
+            if not self.jumping and fabs(self.velocity.y) < 50:
                 self.jumping = True
                 self.jump_pressing_ended = False
                 self.velocity.y = MAX_JUMP_SPEED
