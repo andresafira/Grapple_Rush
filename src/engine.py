@@ -31,7 +31,7 @@ class Engine:
         self.clock = pygame.time.Clock()
         
         self.level.create(level_number = 1)
-        self.player: Union[None, Player] = Player(10, HEIGHT - 10, 20, 40)
+        self.player: Union[None, Player] = Player(100, HEIGHT - 100, 20, 40)
 
     def run(self):
         running = True

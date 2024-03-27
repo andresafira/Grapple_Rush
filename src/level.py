@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Union
 from player import Player
 from geometry.vector import Vector
 from constants.game_constants import TILE_HEIGHT, TILE_WIDTH, FPS, LEVELS_PATH, N_LEVELS, HEIGHT, WIDTH
@@ -31,7 +32,7 @@ class Level:
             return False
         return True
 
-    def simulate_move_corner(self, player, x_inc, y_inc) -> tuple[bool, bool, int, int]:
+    def simulate_move_corner(self, player, x_inc, y_inc) -> tuple[bool, bool, Union[int, None], Union[int, None]]:
         next_pos = player.position + player.velocity * player.dt
         next_pos.x += x_inc*player.width
         next_pos.y -= y_inc*player.height
@@ -39,8 +40,8 @@ class Level:
         i_next = int((HEIGHT - next_pos.y) // TILE_HEIGHT)
         j_next = int(next_pos.x // TILE_WIDTH)
         
-        keep_Xpeed, keep_Yspeed = True, True
-        new_x, new_y = -1, -1
+        keep_Xspeed, keep_Yspeed = True, True
+        new_x, new_y = None, None
 
         if not self.is_valid(i_next, j_next) or self.map[i_next][j_next] != 0:
             i_current = int((HEIGHT - player.position.y + y_inc*player.height) // TILE_HEIGHT)
@@ -50,21 +51,44 @@ class Level:
                 keep_Yspeed = False
                 updated = True
             if not self.is_valid(i_current, j_next) or self.map[i_current][j_next] != 0:
-                keep_Xpeed = False
+                keep_Xspeed = False
                 updated = True
             if not updated:
-                keep_Xpeed, keep_Yspeed = False, False
-        return keep_Xpeed, keep_Yspeed
+                keep_Xspeed, keep_Yspeed = False, False
+
+        if not keep_Xspeed:
+            if player.velocity.x > 0:
+                new_x = j_next * TILE_WIDTH - 0.5
+            else:
+                new_x = j_current * TILE_WIDTH + 0.5
+        
+        if not keep_Yspeed:
+            if player.velocity.y < 0:
+                new_y = HEIGHT - i_next * TILE_HEIGHT + 0.5
+            else:
+                new_y = HEIGHT - i_current * TILE_HEIGHT - 0.5
+        return keep_Xspeed, keep_Yspeed, new_x, new_y
 
     def simulate_move(self, player: Player):
         keep_Xspeed, keep_Yspeed = True, True
-        for x in (0, 1):
-            for y in (0, 1):
+        new_x, new_y = None, None
+        for x in (1, 0.5, 0):
+            for y in (1, 0.5, 0):
                 if (not keep_Yspeed and not keep_Xspeed):
                     continue
-                temp = self.simulate_move_corner(player, x, y)
-                keep_Xspeed = keep_Xspeed and temp[0]
-                keep_Yspeed = keep_Yspeed and temp[0]
+                xkeep, ykeep, xnew, ynew = self.simulate_move_corner(player, x, y)
+                keep_Xspeed = keep_Xspeed and xkeep
+                keep_Yspeed = keep_Yspeed and ykeep
+                
+                if xnew is not None:
+                    new_x = xnew - x * player.width
+                if ynew is not None:
+                    new_y = ynew + y * player.height
+        #if new_x is not None:
+        #   player.position.x = new_x
+        #if new_y is not None:
+        #   player.position.y = new_y
+        
         if not keep_Xspeed:
             player.velocity.x = 0
         if not keep_Yspeed:
