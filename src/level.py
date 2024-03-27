@@ -31,7 +31,7 @@ class Level:
             return False
         return True
 
-    def simulate_move_corner(self, player, x_inc, y_inc) -> list[bool, bool]:
+    def simulate_move_corner(self, player, x_inc, y_inc) -> tuple[bool, bool, int, int]:
         next_pos = player.position + player.velocity * player.dt
         next_pos.x += x_inc*player.width
         next_pos.y -= y_inc*player.height
@@ -39,31 +39,35 @@ class Level:
         i_next = int((HEIGHT - next_pos.y) // TILE_HEIGHT)
         j_next = int(next_pos.x // TILE_WIDTH)
         
-        ans = [True, True]
+        keep_Xpeed, keep_Yspeed = True, True
+        new_x, new_y = -1, -1
 
         if not self.is_valid(i_next, j_next) or self.map[i_next][j_next] != 0:
             i_current = int((HEIGHT - player.position.y + y_inc*player.height) // TILE_HEIGHT)
             j_current = int((player.position.x + x_inc*player.width) // TILE_WIDTH)
             updated = False
             if not self.is_valid(i_next, j_current) or self.map[i_next][j_current] != 0:
-                ans[1] = False
+                keep_Yspeed = False
                 updated = True
             if not self.is_valid(i_current, j_next) or self.map[i_current][j_next] != 0:
-                ans[0] = False
+                keep_Xpeed = False
                 updated = True
             if not updated:
-                ans = [False, False]
-        return ans
+                keep_Xpeed, keep_Yspeed = False, False
+        return keep_Xpeed, keep_Yspeed
 
     def simulate_move(self, player: Player):
-        keep_speed = [True, True]
+        keep_Xspeed, keep_Yspeed = True, True
         for x in (0, 1):
             for y in (0, 1):
+                if (not keep_Yspeed and not keep_Xspeed):
+                    continue
                 temp = self.simulate_move_corner(player, x, y)
-                keep_speed = [keep_speed[i] and temp[i] for i in range(2)]
-        if not keep_speed[0]:
+                keep_Xspeed = keep_Xspeed and temp[0]
+                keep_Yspeed = keep_Yspeed and temp[0]
+        if not keep_Xspeed:
             player.velocity.x = 0
-        if not keep_speed[1]:
+        if not keep_Yspeed:
             player.velocity.y = 0
             player.jumping = False
     
