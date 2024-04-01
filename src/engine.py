@@ -7,7 +7,8 @@ from constants.game_constants import FPS, WIDTH, HEIGHT
 
 # pygame libraries management
 import pygame
-from pygame.transform import scale, rotate from pygame.image import load
+from pygame.transform import scale, rotate
+from pygame.image import load
 from pygame.locals import *
 from pygame import display
 
