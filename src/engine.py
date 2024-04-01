@@ -7,8 +7,7 @@ from constants.game_constants import FPS, WIDTH, HEIGHT
 
 # pygame libraries management
 import pygame
-from pygame.transform import scale, rotate
-from pygame.image import load
+from pygame.transform import scale, rotate from pygame.image import load
 from pygame.locals import *
 from pygame import display
 
@@ -29,7 +28,7 @@ class Engine:
         self.state: GameState = GameState.GAME
         self.level: Union[None, Level] = Level()
         self.clock = pygame.time.Clock()
-        
+
         self.level.create(level_number = 1)
         self.player: Union[None, Player] = Player(100, HEIGHT - 100, 20, 40)
 
@@ -37,12 +36,12 @@ class Engine:
         running = True
         while running:
             self.clock.tick(FPS)
-            
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or pygame.key.get_pressed()[K_ESCAPE]:
                     running = False
                     break
-            
+
             if self.state == GameState.MENU:
                 self.menu()
             elif self.state == GameState.GAME:
@@ -53,7 +52,7 @@ class Engine:
                 raise Exception(f"Invalid Game State: {self.state}")
 
         pygame.quit()
-    
+
     def draw_background(self):
         self.screen.fill((0, 0, 0))
 
@@ -87,16 +86,28 @@ class Engine:
         else:
             jump = False
 
+        # check for mouse click
+        prev_left_click = False
+        left_click = pygame.mouse.get_pressed()[0]
+        if left_click and not prev_left_click:
+            self.player.gh_holstered = False
+            self.player.gh_threw = True
+        prev_left_click = left_click
+
+        if keys[pygame.K_SPACE] and not self.player.gh_holstered:
+            self.player.gh_attached = True
+
         self.player.update_velocity(horizontal_movement, jump)
+        self.player.update_gh_aim(self.screen) # change function name and divide it in smaller functions
         self.level.simulate_move(self.player)
         self.player.move()
 
         self.draw_game()
-    
+
     def options(self):
         # Stuff
 
         # if choose == menu -> self.state = GameState.Menu
         raise NotImplemented()
 
-    
+

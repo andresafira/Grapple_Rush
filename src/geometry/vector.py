@@ -29,10 +29,10 @@ class Vector:
 
     def dot(self, other):
         return self.x * other.x + self.y * other.y
-    
+
     def abs(self):
         return sqrt(self.x * self.x + self.y * self.y)
-    
+
     def normalize(self, new_mod: float = 1):
         if self.abs() < 0.001:
             return self
