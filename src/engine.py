@@ -101,6 +101,7 @@ class Engine:
         self.player.update_velocity(horizontal_movement, jump)
         self.player.update_gh_aim(self.screen) # change function name and divide it in smaller functions
         self.level.simulate_move_player(self.player)
+        self.level.simulate_move_gh(self.player)
         self.player.move()
 
         self.draw_game()

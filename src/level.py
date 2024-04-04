@@ -66,6 +66,30 @@ class Level:
                 new_y = HEIGHT - i_current * TILE_HEIGHT - PIXEL_CORRECTION
         return keep_Xspeed, keep_Yspeed, new_x, new_y
 
+    def simulate_move_gh(self, player: Player):
+        keep_Xspeed, keep_Yspeed = True, True
+        new_x, new_y = None, None
+        can_jump = False
+        for x in (0, 0.25, 0.5, 0.75, 1):
+            for y in (0, 0.25, 0.5, 0.75, 1):
+                if (not keep_Yspeed and not keep_Xspeed):
+                    continue
+                corner_position = player.gh_position + Vector(x*15, -y*5)
+                xkeep, ykeep, xnew, ynew = self.simulate_move_point(corner_position, player.gh_velocity)
+                keep_Xspeed = keep_Xspeed and xkeep
+                keep_Yspeed = keep_Yspeed and ykeep
+
+                if xnew is not None:
+                    new_x = xnew - x * 15
+                if ynew is not None:
+                    new_y = ynew + y * 5
+        if new_x is not None:
+           player.gh_position.x = new_x
+           player.gh_attached = True
+        if new_y is not None:
+           player.gh_position.y = new_y
+           player.gh_attached = True
+
     def simulate_move_player(self, player: Player):
         keep_Xspeed, keep_Yspeed = True, True
         new_x, new_y = None, None
