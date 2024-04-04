@@ -56,12 +56,11 @@ class Player:
 
         if self.gh_attached:
             self.gh_approaching = True
-            gh_dist = sqrt((self.position.x - self.gh_position.x) ** 2 + (self.position.y - self.gh_position.y) ** 2)
-            if gh_dist == 0:
+            if gh_distance == 0:
                 self.holstered = True
                 return
-            self.velocity.x = -GRAPPLING_HOOK_SPEED * (self.position.x - self.gh_position.x) / gh_dist
-            self.velocity.y = -GRAPPLING_HOOK_SPEED * (self.position.y - self.gh_position.y) / gh_dist
+            self.velocity.x = -GRAPPLING_HOOK_SPEED * (self.position.x - self.gh_position.x) / gh_distance
+            self.velocity.y = -GRAPPLING_HOOK_SPEED * (self.position.y - self.gh_position.y) / gh_distance
             self.gh_velocity.x = 0
             self.gh_velocity.y = 0
 
