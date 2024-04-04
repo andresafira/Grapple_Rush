@@ -67,6 +67,8 @@ class Level:
         return keep_Xspeed, keep_Yspeed, new_x, new_y
 
     def simulate_move_gh(self, player: Player):
+        if player.gh_holstered:
+            return
         keep_Xspeed, keep_Yspeed = True, True
         new_x, new_y = None, None
         can_jump = False
