@@ -3,7 +3,8 @@ from typing import Union
 
 from level import Level
 from player import Player
-from constants.game_constants import FPS, WIDTH, HEIGHT, ROWS, COLS, TILE_WIDTH, TILE_HEIGHT, SIDE_MARGIN, LOWER_MARGIN
+from editor import Editor
+from constants.game_constants import FPS, WIDTH, HEIGHT, ROWS, COLS, SIDE_MARGIN, LOWER_MARGIN
 
 # pygame libraries management
 import pygame
@@ -29,6 +30,7 @@ class Engine:
         self.resized = False
         self.state: GameState = GameState.EDITOR
         self.level: Union[None, Level] = Level()
+        self.level_editor = Editor(self.screen)
         self.clock = pygame.time.Clock()
         
         self.level.create(level_number = 1)
@@ -68,11 +70,11 @@ class Engine:
         width = self.sky_img.get_width()
         for x in range(3):
             self.screen.blit(self.sky_img, ((x * width), HEIGHT - 3*self.sky_img.get_height()))
-            self.screen.blit(self.sky_img, ((x * width), HEIGHT - 3 * self.sky_img.get_height() - 60))
+            self.screen.blit(self.sky_img, ((x * width), HEIGHT - 2 * self.sky_img.get_height() - 30))
             self.screen.blit(self.sky_cloud_img, ((x * width), 0))
-            self.screen.blit(self.mountain_img, ((x * width), HEIGHT - self.mountain_img.get_height() - 400))
-            self.screen.blit(self.pine1_img, ((x * width), HEIGHT - self.pine1_img.get_height() - 350))
-            self.screen.blit(self.pine2_img, ((x * width), HEIGHT - self.pine2_img.get_height() - 300))
+            self.screen.blit(self.mountain_img, ((x * width), HEIGHT - self.mountain_img.get_height() - 180))
+            self.screen.blit(self.pine1_img, ((x * width), HEIGHT - self.pine1_img.get_height() - 100))
+            self.screen.blit(self.pine2_img, ((x * width), HEIGHT - self.pine2_img.get_height() - 10))
 
     def draw_game(self):
         self.draw_background()
@@ -82,13 +84,6 @@ class Engine:
 
         pygame.display.update()
 
-    def draw_grid(self):
-        for col_num in range(COLS + 1):
-            pygame.draw.line(self.screen, (255, 255, 255), (col_num * TILE_WIDTH, 0), (col_num * TILE_WIDTH, HEIGHT))
-
-        for row_num in range(ROWS + 1):
-            pygame.draw.line(self.screen, (255, 255, 255), (0, row_num * TILE_HEIGHT), (WIDTH, row_num * TILE_HEIGHT))
-
     def menu(self):
         # Stuff
 
@@ -97,6 +92,10 @@ class Engine:
         raise NotImplemented()
 
     def game(self):
+        if self.resized:
+            self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+            self.resized = False
+
         keys = pygame.key.get_pressed()
         horizontal_movement = 'none'
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
@@ -128,7 +127,9 @@ class Engine:
             self.screen = pygame.display.set_mode((WIDTH + SIDE_MARGIN, HEIGHT + LOWER_MARGIN))
             self.resized = True
         pygame.display.flip()
+
         self.draw_background()
-        self.draw_grid()
+        # self.level_editor.draw_grid()
+        self.level_editor.draw_tile_panel()
 
         pygame.display.update()
