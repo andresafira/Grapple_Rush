@@ -83,14 +83,10 @@ class Level:
 
                 if xnew is not None:
                     new_x = xnew - x * 15
+                    player.gh_attached = True
                 if ynew is not None:
                     new_y = ynew + y * 5
-        if new_x is not None:
-           player.gh_position.x = new_x
-           player.gh_attached = True
-        if new_y is not None:
-           player.gh_position.y = new_y
-           player.gh_attached = True
+                    player.gh_attached = True
 
     def simulate_move_player(self, player: Player):
         keep_Xspeed, keep_Yspeed = True, True
