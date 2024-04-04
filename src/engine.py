@@ -4,7 +4,7 @@ from typing import Union
 from level import Level
 from player import Player
 from editor import Editor
-from constants.game_constants import FPS, WIDTH, HEIGHT, ROWS, COLS, SIDE_MARGIN, LOWER_MARGIN
+from constants.game_constants import FPS, WIDTH, HEIGHT, SIDE_MARGIN, LOWER_MARGIN, GREEN, WHITE
 
 # pygame libraries management
 import pygame
@@ -36,11 +36,11 @@ class Engine:
         self.level.create(level_number = 1)
         self.player: Union[None, Player] = Player(100, HEIGHT - 100, 20, 40)
 
-        self.pine1_img = pygame.image.load('Background/pine1.png').convert_alpha()
-        self.pine2_img = pygame.image.load('Background/pine2.png').convert_alpha()
-        self.mountain_img = pygame.image.load('Background/mountain2.png').convert_alpha()
-        self.sky_cloud_img = pygame.image.load('Background/sky_cloud.png').convert_alpha()
-        self.sky_img = pygame.image.load('Background/sky_2.png').convert_alpha()
+        self.pine1_img = pygame.image.load('background/pine1.png').convert_alpha()
+        self.pine2_img = pygame.image.load('background/pine2.png').convert_alpha()
+        self.mountain_img = pygame.image.load('background/mountain2.png').convert_alpha()
+        self.sky_cloud_img = pygame.image.load('background/sky_cloud.png').convert_alpha()
+        self.sky_img = pygame.image.load('background/sky_2.png').convert_alpha()
 
     def run(self):
         running = True
@@ -66,7 +66,7 @@ class Engine:
         pygame.quit()
     
     def draw_background(self):
-        self.screen.fill((0, 0, 0))
+        self.screen.fill(GREEN)
         width = self.sky_img.get_width()
         for x in range(3):
             self.screen.blit(self.sky_img, ((x * width), HEIGHT - 3*self.sky_img.get_height()))
@@ -74,7 +74,7 @@ class Engine:
             self.screen.blit(self.sky_cloud_img, ((x * width), 0))
             self.screen.blit(self.mountain_img, ((x * width), HEIGHT - self.mountain_img.get_height() - 180))
             self.screen.blit(self.pine1_img, ((x * width), HEIGHT - self.pine1_img.get_height() - 100))
-            self.screen.blit(self.pine2_img, ((x * width), HEIGHT - self.pine2_img.get_height() - 10))
+            self.screen.blit(self.pine2_img, ((x * width), HEIGHT - self.pine2_img.get_height()))
 
     def draw_game(self):
         self.draw_background()
@@ -129,7 +129,11 @@ class Engine:
         pygame.display.flip()
 
         self.draw_background()
-        # self.level_editor.draw_grid()
+        self.level_editor.draw_grid()
         self.level_editor.draw_tile_panel()
+        self.level_editor.draw_map()
+        self.level_editor.draw_text(f'User level: {self.level_editor.level}', WHITE, 10, HEIGHT + LOWER_MARGIN - 90)
+        self.level_editor.draw_text('Press UP or DOWN to change level. Right-click to delete a block', WHITE, 10, HEIGHT + LOWER_MARGIN - 60)
+        self.level_editor.user_input()
 
         pygame.display.update()
