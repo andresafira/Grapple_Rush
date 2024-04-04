@@ -2,7 +2,7 @@ from geometry.vector import Vector
 from constants.player_constants import *
 from constants.game_constants import FPS
 from typing import Union
-from math import fabs, sqrt
+from math import fabs, sqrt, atan, cos, sin, pi
 import pygame
 
 
@@ -25,11 +25,19 @@ class Player:
         self.gh_threw: bool = False
         self.gh_surface = pygame.Surface((15, 5))
 
+        self.space_key: bool = False
+
         self.jumping: bool = True
         self.jump_pressing_ended: bool = False
 
     def update_gh_aim(self, screen):
         _, _, _, screen_height = screen.get_rect()
+        gh_distance = sqrt((self.position.x - self.gh_position.x) ** 2 + (self.position.y - self.gh_position.y) ** 2)
+
+        if self.space_key and not self.gh_holstered:
+            self.gh_attached = False
+            self.gh_holstered = True
+        self.space_key = False
 
         if self.gh_threw:
             self.gh_holstered = False
@@ -41,26 +49,45 @@ class Player:
 
         self.gh_threw = False
 
-        gh_distance = sqrt((self.position.x - self.gh_position.x) ** 2 + (self.position.y - self.gh_position.y) ** 2)
 
         if gh_distance > GH_MAX_LENGTH:
             self.gh_approaching = True
             self.gh_velocity.x = -self.gh_velocity.x
             self.gh_velocity.y = -self.gh_velocity.y
 
-        if self.gh_approaching and gh_distance < GH_MIN_LENGTH:
-            self.gh_holstered = True
-            self.gh_attached = False
-            self.gh_velocity.x = 0
-            self.gh_velocity.y = 0
-
         if self.gh_attached:
+
+            if gh_distance < GH_MIN_LENGTH:
+                self.gh_approaching = False
+
+                alpha =  pi / 2
+                if not self.gh_position.y == self.position.y:
+                    alpha = atan(abs((self.position.x - self.gh_position.x) / (self.gh_position.y - self.position.y)))
+
+                pendulum_velocity = sqrt(2 * abs(BASE_G_VALUE) * gh_distance * (1 - cos(alpha)))
+
+                if self.position.x > self.gh_position.x:
+                    self.velocity.x = -pendulum_velocity * cos(alpha)
+                    self.velocity.y = pendulum_velocity * sin(alpha)
+                else:
+                    self.velocity.x = pendulum_velocity * cos(alpha)
+                    self.velocity.y = pendulum_velocity * sin(alpha)
+
+                self.gh_velocity.x = 0
+                self.gh_velocity.y = 0
+                return
+
             self.gh_approaching = True
             if gh_distance == 0:
                 self.holstered = True
                 return
             self.velocity.x = -GRAPPLING_HOOK_SPEED * (self.position.x - self.gh_position.x) / gh_distance
             self.velocity.y = -GRAPPLING_HOOK_SPEED * (self.position.y - self.gh_position.y) / gh_distance
+            self.gh_velocity.x = 0
+            self.gh_velocity.y = 0
+
+        if self.gh_approaching and gh_distance < GH_MIN_LENGTH:
+            self.gh_holstered = True
             self.gh_velocity.x = 0
             self.gh_velocity.y = 0
 

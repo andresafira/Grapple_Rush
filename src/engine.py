@@ -31,7 +31,7 @@ class Engine:
         self.clock = pygame.time.Clock()
 
         self.level.create(level_number = 1)
-        self.player: Union[None, Player] = Player(100, HEIGHT - 100, 20, 40)
+        self.player: Union[None, Player] = Player(400, HEIGHT - 400, 20, 40)
 
     def run(self):
         running = True
@@ -95,8 +95,8 @@ class Engine:
             self.player.gh_threw = True
         prev_left_click = left_click
 
-        if keys[pygame.K_SPACE] and not self.player.gh_holstered:
-            self.player.gh_attached = True
+        if keys[pygame.K_SPACE]:
+           self.player.space_key = True
 
         self.player.update_velocity(horizontal_movement, jump)
         self.player.update_gh_aim(self.screen) # change function name and divide it in smaller functions
