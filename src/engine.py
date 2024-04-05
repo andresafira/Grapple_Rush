@@ -28,7 +28,7 @@ class Engine:
         pygame.display.set_caption("Grappler Rush")
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.resized = False
-        self.state: GameState = GameState.EDITOR
+        self.state: GameState = GameState.GAME
         self.level: Union[None, Level] = Level()
         self.level_editor = Editor(self.screen)
         self.clock = pygame.time.Clock()
