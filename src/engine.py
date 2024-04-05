@@ -111,7 +111,7 @@ class Engine:
             jump = False
 
         self.player.update_velocity(horizontal_movement, jump)
-        self.level.simulate_move(self.player)
+        self.level.simulate_move_player(self.player)
         self.player.move()
 
         self.draw_game()
