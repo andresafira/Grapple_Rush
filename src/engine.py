@@ -4,7 +4,8 @@ from typing import Union
 from level import Level
 from player import Player
 from editor import Editor
-from constants.game_constants import FPS, WIDTH, HEIGHT, SIDE_MARGIN, LOWER_MARGIN, GREEN, WHITE
+from constants.game_constants import FPS, WIDTH, HEIGHT, SIDE_MARGIN, LOWER_MARGIN, GREEN, WHITE, BLACK
+from constants.player_constants import PLAYER_WIDTH, PLAYER_HEIGHT
 
 # pygame libraries management
 import pygame
@@ -13,6 +14,7 @@ from pygame.image import load
 from pygame.locals import *
 from pygame import display
 
+from button import Button
 
 class GameState(Enum):
     MENU = 0
@@ -25,22 +27,35 @@ class GameState(Enum):
 class Engine:
     def __init__(self):
         pygame.init()
-        pygame.display.set_caption("Grappler Rush")
+        pygame.display.set_caption("Grapple Rush")
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.resized = False
-        self.state: GameState = GameState.GAME
+        self.state: GameState = GameState.MENU
         self.level: Union[None, Level] = Level()
         self.level_editor = Editor(self.screen)
         self.clock = pygame.time.Clock()
         
         self.level.create(level_number = 1)
-        self.player: Union[None, Player] = Player(100, HEIGHT - 100, 20, 40)
+        self.player: Union[None, Player] = Player(100, HEIGHT - 100, PLAYER_WIDTH, PLAYER_HEIGHT)
 
         self.pine1_img = pygame.image.load('background/pine1.png').convert_alpha()
         self.pine2_img = pygame.image.load('background/pine2.png').convert_alpha()
         self.mountain_img = pygame.image.load('background/mountain2.png').convert_alpha()
         self.sky_cloud_img = pygame.image.load('background/sky_cloud.png').convert_alpha()
         self.sky_img = pygame.image.load('background/sky_2.png').convert_alpha()
+
+        self.menu_img = pygame.image.load('background/menu_background.png').convert_alpha()
+        self.menu_img = scale(self.menu_img, (WIDTH, HEIGHT))
+
+        self.text_font = pygame.font.SysFont('Futura', 30)
+
+        #self.game_button_img = pygame.image.load('background/game_button.png').convert_alpha() 
+        #self.options_button_img = pygame.image.load('background/options_button.png').convert_alpha()
+
+        #self.game_button = Button(MENU_GAME_X, MENU_GAME_Y, self.game_button_img, 1)
+        #self.options_button = Button(MENU_OPTIONS_X, MENU_OPTIONS_Y, self.options_button_img, 1)
+        
+        self.elapsed_time: float = 0.0
 
     def run(self):
         running = True
@@ -56,8 +71,6 @@ class Engine:
                 self.menu()
             elif self.state == GameState.GAME:
                 self.game()
-            elif self.state == GameState.OPTIONS:
-                self.options()
             elif self.state == GameState.EDITOR:
                 self.editor()
             else:
@@ -69,12 +82,17 @@ class Engine:
         self.screen.fill(GREEN)
         width = self.sky_img.get_width()
         for x in range(3):
-            self.screen.blit(self.sky_img, ((x * width), HEIGHT - 3*self.sky_img.get_height()))
-            self.screen.blit(self.sky_img, ((x * width), HEIGHT - 2 * self.sky_img.get_height() - 30))
+            self.screen.blit(self.sky_img, ((x * width),
+                            HEIGHT - 3*self.sky_img.get_height()))
+            self.screen.blit(self.sky_img, ((x * width),
+                            HEIGHT - 2 * self.sky_img.get_height() - 30))
             self.screen.blit(self.sky_cloud_img, ((x * width), 0))
-            self.screen.blit(self.mountain_img, ((x * width), HEIGHT - self.mountain_img.get_height() - 180))
-            self.screen.blit(self.pine1_img, ((x * width), HEIGHT - self.pine1_img.get_height() - 100))
-            self.screen.blit(self.pine2_img, ((x * width), HEIGHT - self.pine2_img.get_height()))
+            self.screen.blit(self.mountain_img, ((x * width),
+                            HEIGHT - self.mountain_img.get_height() - 180))
+            self.screen.blit(self.pine1_img, ((x * width),
+                            HEIGHT - self.pine1_img.get_height() - 100))
+            self.screen.blit(self.pine2_img, ((x * width),
+                            HEIGHT - self.pine2_img.get_height()))
 
     def draw_game(self):
         self.draw_background()
@@ -82,16 +100,25 @@ class Engine:
         self.player.draw(self.screen, (0, 0))
         # draw GH
 
+    def menu(self):
+        self.screen.blit(self.menu_img, (0, 0))
+
+        if any(pygame.key.get_pressed()):
+            self.state = GameState.GAME
+            self.elapsed_time = self.clock.get_time()
+            self.elapsed_time = 0
+
+        #if self.game_button.draw(self.screen):
+        #    self.state = GameState.GAME
         pygame.display.update()
 
-    def menu(self):
-        # Stuff
-
-        # if choose == play -> self.state = GameState.GAME
-        # elif choose == options -> self.state = GameState.OPTIONS
-        raise NotImplemented()
-
     def game(self):
+        self.elapsed_time += self.clock.get_time()
+        current_time_s = int(self.elapsed_time / 1000)
+        minutes: int = int(current_time_s // 60)
+        seconds: int = int(current_time_s - minutes * 60)
+        timer: str = '{:0>2}:{:0>2}'.format(minutes, seconds)
+
         if self.resized:
             self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
             self.resized = False
@@ -115,13 +142,12 @@ class Engine:
         self.player.move()
 
         self.draw_game()
+
+        text_img = self.text_font.render(timer, True, BLACK)
+        self.screen.blit(text_img, (10, 10))
+        
+        pygame.display.update()
     
-    def options(self):
-        # Stuff
-
-        # if choose == menu -> self.state = GameState.Menu
-        raise NotImplemented()
-
     def editor(self):
         if not self.resized:
             self.screen = pygame.display.set_mode((WIDTH + SIDE_MARGIN, HEIGHT + LOWER_MARGIN))
