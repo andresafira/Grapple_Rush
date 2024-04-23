@@ -17,4 +17,4 @@ PIXEL_CORRECTION = 0.05
 
 # Levels path
 LEVELS_PATH: str = "levels/"
-N_LEVELS = 1
+N_LEVELS = 2

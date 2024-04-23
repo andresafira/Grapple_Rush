@@ -45,7 +45,7 @@ class Level:
 
     def simulate_move_point(self, position: Vector, velocity: Vector) -> tuple[bool, bool, Union[int, None], Union[int, None]]:
         # Function that determines if the player is going to hit something on the next frame, and
-        # if so, updates if velocityand position, so it don't.
+        # if so, updates if velocity and position, so it don't.
         # returns xkeep, ykeep, xnew, ynew
         next_pos = position + velocity * (1 / FPS)
 
@@ -113,6 +113,10 @@ class Level:
         _, _, _, screen_height = screen.get_rect()
         for i in range(len(self.map)):
             for j in range(len(self.map[0])):
+                if self.map[i][j] == -2:
+                    pygame.draw.rect(screen, (255, 0, 0),
+                        (j*TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT))
+                    continue
                 if self.map[i][j] == -1:
                     continue
                 pygame.draw.rect(screen, (0, 255, 0),

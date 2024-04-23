@@ -21,6 +21,7 @@ class GameState(Enum):
     GAME = 1
     OPTIONS = 2
     EDITOR = 3
+    END = 4
     # add other states
 
 
@@ -48,6 +49,8 @@ class Engine:
 
         self.menu_img = pygame.image.load('background/menu_background.png').convert_alpha()
         self.menu_img = scale(self.menu_img, (WIDTH, HEIGHT))
+
+        self.end_img = scale(pygame.image.load('background/thend.png').convert_alpha(), (WIDTH, HEIGHT))
 
         self.text_font = pygame.font.SysFont('Futura', 30)
 
@@ -78,6 +81,8 @@ class Engine:
                 self.game()
             elif self.state == GameState.EDITOR:
                 self.editor()
+            elif self.state == GameState.END:
+                self.end()
             else:
                 raise Exception(f"Invalid Game State: {self.state}")
 
@@ -108,8 +113,8 @@ class Engine:
     def menu(self):
         self.screen.blit(self.menu_img, (0, 0))
 
-        if any(pygame.key.get_pressed()):
-            pygame.mixer.music.load('ost/sunshine.mp3')
+        if pygame.key.get_pressed()[pygame.K_p]:
+            pygame.mixer.music.load('ost/karla.mp3')
             pygame.mixer.music.play(-1)
             self.state = GameState.GAME
             self.elapsed_time = self.clock.get_time()
@@ -123,16 +128,6 @@ class Engine:
         self.player = Player(50, HEIGHT - 50, PLAYER_WIDTH, PLAYER_HEIGHT)
 
     def game(self):
-        self.elapsed_time += self.clock.get_time()
-        current_time_s = int(self.elapsed_time / 1000)
-        minutes: int = int(current_time_s // 60)
-        seconds: int = int(current_time_s - minutes * 60)
-        timer: str = '{:0>2}:{:0>2}'.format(minutes, seconds)
-
-        if self.resized:
-            self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-            self.resized = False
-
         keys = pygame.key.get_pressed()
         horizontal_movement = 'none'
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
@@ -151,9 +146,24 @@ class Engine:
         self.level.simulate_move_player(self.player)
         self.player.move()
 
+        level_finished = self.level.update_player_state(self.player)
+        
         self.draw_game()
-
+        self.draw_timer()
         pygame.display.update()
+        
+        if not self.player.alive:
+            self.restart_player()
+
+        if level_finished:
+            self.restart_player()
+            self.level_number += 1
+            if self.level_number > N_LEVELS:
+                pygame.mixer.music.load('ost/sunshine.mp3')
+                pygame.mixer.music.play(-1)
+                self.state = GameState.END
+            else:
+                self.level.create(self.level_number)
 
     def draw_timer(self):
         self.elapsed_time += self.clock.get_time()
@@ -179,5 +189,16 @@ class Engine:
         self.level_editor.draw_text(f'User level: {self.level_editor.level}', WHITE, 10, HEIGHT + LOWER_MARGIN - 90)
         self.level_editor.draw_text('Press UP or DOWN to change level. Right-click to delete a block', WHITE, 10, HEIGHT + LOWER_MARGIN - 60)
         self.level_editor.user_input()
+
+        pygame.display.update()
+
+    def end(self):
+        self.screen.blit(self.end_img, (0, 0))
+        
+        if pygame.key.get_pressed()[pygame.K_r]:
+            pygame.mixer.music.load('ost/CPOR_BRASIL.mp3')
+            pygame.mixer.music.play(-1)
+            self.state = GameState.MENU
+            self.level_number = 1
 
         pygame.display.update()
