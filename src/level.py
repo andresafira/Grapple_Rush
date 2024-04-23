@@ -8,13 +8,6 @@ import pygame
 import json
 
 
-class Tile(Enum):
-    GOAL = -1
-    EMPTY = 0
-    BLOCK = 1
-    DAMAGE = 2
-
-
 class Level:
     def __init__(self):
         self.map: list[list[Tile]] = [[]]
@@ -41,10 +34,11 @@ class Level:
             for y in HITPOINTS['y']:
                 pos_y = player.position.y - y*player.height
                 i_pos = int((HEIGHT - pos_y) // TILE_HEIGHT)
-
-                if self.map[i_pos][j_pos] == Tile.DAMAGE:
+                
+                # water kills you
+                if self.map[i_pos][j_pos] == 9 or self.map[i_pos][j_pos] == 10:
                     player.alive = False
-                elif self.map[i_pos][j_pos] == Tile.GOAL:
+                elif self.map[i_pos][j_pos] == -2: # goal flag
                     completed_level = True
 
         return completed_level
@@ -61,15 +55,15 @@ class Level:
         keep_Xspeed, keep_Yspeed = True, True
         new_x, new_y = None, None
         
-        if not self.is_valid(i_next, j_next) or self.map[i_next][j_next] != Tile.EMPTY:
+        if not self.is_valid(i_next, j_next) or self.map[i_next][j_next] >= 0:
             i_current = int((HEIGHT - position.y) // TILE_HEIGHT)
             j_current = int(position.x // TILE_WIDTH)
             
             updated = False
-            if not self.is_valid(i_next, j_current) or self.map[i_next][j_current] != Tile.EMPTY:
+            if not self.is_valid(i_next, j_current) or self.map[i_next][j_current] >= 0:
                 keep_Yspeed = False
                 updated = True
-            if not self.is_valid(i_current, j_next) or self.map[i_current][j_next] != Tile.EMPTY:
+            if not self.is_valid(i_current, j_next) or self.map[i_current][j_next] >= 0:
                 keep_Xspeed = False
                 updated = True
 
@@ -119,7 +113,7 @@ class Level:
         _, _, _, screen_height = screen.get_rect()
         for i in range(len(self.map)):
             for j in range(len(self.map[0])):
-                if self.map[i][j] != 1:
+                if self.map[i][j] == -1:
                     continue
                 pygame.draw.rect(screen, (0, 255, 0),
                     (j*TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT))
