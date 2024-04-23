@@ -106,8 +106,8 @@ class Engine:
 
     def draw_game(self):
         self.draw_background()
-        self.level.draw(self.screen, (0, 0))
-        self.player.draw(self.screen, (0, 0))
+        self.level.draw(self.screen)
+        self.player.draw(self.screen)
         # draw GH
 
     def menu(self):
