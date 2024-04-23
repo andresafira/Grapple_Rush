@@ -4,8 +4,8 @@
 GH_MAX_LENGTH: float = 6.9
 GH_MAX_THRUST: float = 6.9
 
-PLAYER_WIDHT: float = 6.9
-PLAYER_HEIGHT: float = 6.9
+PLAYER_WIDTH: int = 30
+PLAYER_HEIGHT: int = 60
 
 # Movement Constants
 ACC_KP: float = 8 # Proportionality constant for horizontal movement: acc = ACC_KP*(target_speed - speed)
