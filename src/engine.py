@@ -170,9 +170,6 @@ class Engine:
         if not self.player.alive:
             self.restart_player()
 
-    def options(self):
-        # Stuff
-
         if level_finished:
             self.restart_player()
             self.level_number += 1
