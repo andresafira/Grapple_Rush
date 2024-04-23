@@ -1,4 +1,4 @@
-from constants.game_constants import WIDTH, HEIGHT, ROWS, COLS, TILE_WIDTH, TILE_HEIGHT, SIDE_MARGIN, LOWER_MARGIN, TILES_NUM, GREEN, RED, LEVELS_PATH
+from constants.game_constants import WIDTH, HEIGHT, ROWS, COLS, TILE_WIDTH, TILE_HEIGHT, SIDE_MARGIN, LOWER_MARGIN, TILES_NUM, GREEN, RED, LEVELS_PATH, N_LEVELS
 from button import Button
 import pygame
 import json
@@ -6,7 +6,7 @@ import json
 
 class Editor:
     def __init__(self, game_screen):
-        self.level = 0
+        self.level = N_LEVELS
         self.text_font = pygame.font.SysFont('Futura', 30)
         self.initialized = -1
         self.tiles_list = []
@@ -17,9 +17,9 @@ class Editor:
         self.screen = game_screen
         self.mouse_pos = pygame.mouse.get_pos()
 
-        self.save_button = Button(WIDTH // 2, HEIGHT + LOWER_MARGIN - 50, pygame.image.load(
+        self.save_button = Button(WIDTH // 2 + 60, HEIGHT + LOWER_MARGIN - 50, pygame.image.load(
             'buttons/save_btn.png').convert_alpha(), 1)
-        self.load_button = Button(WIDTH // 2 + 200, HEIGHT + LOWER_MARGIN - 50, pygame.image.load(
+        self.load_button = Button(WIDTH // 2 + 260, HEIGHT + LOWER_MARGIN - 50, pygame.image.load(
             'buttons/load_btn.png').convert_alpha(), 1)
 
     def draw_text(self, text, color, x, y):
@@ -72,7 +72,7 @@ class Editor:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     self.level += 1
-                if event.key == pygame.K_DOWN and self.level > 0:
+                if event.key == pygame.K_DOWN and self.level > N_LEVELS:
                     self.level -= 1
 
     def draw_map(self):
