@@ -194,4 +194,5 @@ class Player:
         sprite = flip(self.sprites[self.sprite_state][self.sprite_count], flip_x = self.flip_sprite, flip_y = False)
         screen.blit(sprite, (self.position.x, screen_height - self.position.y, self.width, self.height))
 
-        pygame.draw.rect(screen, (0, 0, 255), (self.gh_position.x, screen_height - self.gh_position.y, 15, 5))
+        pygame.draw.circle(screen, (0, 0, 0), (self.gh_position.x, screen_height - self.gh_position.y), 5)
+        pygame.draw.line(screen, (255, 255, 255), (self.position.x, screen_height - self.position.y),(self.gh_position.x, screen_height - self.gh_position.y))
