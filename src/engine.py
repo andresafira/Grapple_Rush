@@ -4,7 +4,7 @@ from typing import Union
 from level import Level
 from player import Player
 from editor import Editor
-from constants.game_constants import FPS, WIDTH, HEIGHT, SIDE_MARGIN, LOWER_MARGIN, GREEN, WHITE, BLACK
+from constants.game_constants import FPS, WIDTH, HEIGHT, SIDE_MARGIN, LOWER_MARGIN, GREEN, WHITE, BLACK, N_LEVELS
 from constants.player_constants import PLAYER_WIDTH, PLAYER_HEIGHT
 
 # pygame libraries management
@@ -21,6 +21,7 @@ class GameState(Enum):
     GAME = 1
     OPTIONS = 2
     EDITOR = 3
+    END = 4
     # add other states
 
 
@@ -30,12 +31,14 @@ class Engine:
         pygame.display.set_caption("Grapple Rush")
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.resized = False
+
         self.state: GameState = GameState.MENU
+        self.level_number: int = 1
         self.level: Union[None, Level] = Level()
         self.level_editor = Editor(self.screen)
         self.clock = pygame.time.Clock()
         
-        self.level.create(level_number = 1)
+        self.level.create(level_number = self.level_number)
         self.player: Union[None, Player] = Player(100, HEIGHT - 100, PLAYER_WIDTH, PLAYER_HEIGHT)
 
         self.pine1_img = pygame.image.load('background/pine1.png').convert_alpha()
@@ -47,6 +50,8 @@ class Engine:
         self.menu_img = pygame.image.load('background/menu_background.png').convert_alpha()
         self.menu_img = scale(self.menu_img, (WIDTH, HEIGHT))
 
+        self.end_img = scale(pygame.image.load('background/thend.png').convert_alpha(), (WIDTH, HEIGHT))
+
         self.text_font = pygame.font.SysFont('Futura', 30)
 
         #self.game_button_img = pygame.image.load('background/game_button.png').convert_alpha() 
@@ -56,6 +61,9 @@ class Engine:
         #self.options_button = Button(MENU_OPTIONS_X, MENU_OPTIONS_Y, self.options_button_img, 1)
         
         self.elapsed_time: float = 0.0
+
+        pygame.mixer.music.load('ost/CPOR_BRASIL.mp3')
+        pygame.mixer.music.play(-1)
 
     def run(self):
         running = True
@@ -73,6 +81,8 @@ class Engine:
                 self.game()
             elif self.state == GameState.EDITOR:
                 self.editor()
+            elif self.state == GameState.END:
+                self.end()
             else:
                 raise Exception(f"Invalid Game State: {self.state}")
 
@@ -104,6 +114,8 @@ class Engine:
         self.screen.blit(self.menu_img, (0, 0))
 
         if pygame.key.get_pressed()[pygame.K_p]:
+            pygame.mixer.music.load('ost/karla.mp3')
+            pygame.mixer.music.play(-1)
             self.state = GameState.GAME
             self.elapsed_time = self.clock.get_time()
             self.elapsed_time = 0
@@ -112,17 +124,10 @@ class Engine:
         #    self.state = GameState.GAME
         pygame.display.update()
 
+    def restart_player(self):
+        self.player = Player(50, HEIGHT - 50, PLAYER_WIDTH, PLAYER_HEIGHT)
+
     def game(self):
-        self.elapsed_time += self.clock.get_time()
-        current_time_s = int(self.elapsed_time / 1000)
-        minutes: int = int(current_time_s // 60)
-        seconds: int = int(current_time_s - minutes * 60)
-        timer: str = '{:0>2}:{:0>2}'.format(minutes, seconds)
-
-        if self.resized:
-            self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-            self.resized = False
-
         keys = pygame.key.get_pressed()
         horizontal_movement = 'none'
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
@@ -141,13 +146,36 @@ class Engine:
         self.level.simulate_move_player(self.player)
         self.player.move()
 
+        level_finished = self.level.update_player_state(self.player)
+        
         self.draw_game()
+        self.draw_timer()
+        pygame.display.update()
+        
+        if not self.player.alive:
+            self.restart_player()
 
+        if level_finished:
+            self.restart_player()
+            self.level_number += 1
+            if self.level_number > N_LEVELS:
+                pygame.mixer.music.load('ost/sunshine.mp3')
+                pygame.mixer.music.play(-1)
+                self.state = GameState.END
+            else:
+                self.level.create(self.level_number)
+
+    def draw_timer(self):
+        self.elapsed_time += self.clock.get_time()
+
+        current_time_s = int(self.elapsed_time / 1000)
+        minutes: int = int(current_time_s // 60)
+        seconds: int = int(current_time_s - minutes * 60)
+        timer: str = '{:0>2}:{:0>2}'.format(minutes, seconds)
+        
         text_img = self.text_font.render(timer, True, BLACK)
         self.screen.blit(text_img, (10, 10))
-        
-        pygame.display.update()
-    
+
     def editor(self):
         if not self.resized:
             self.screen = pygame.display.set_mode((WIDTH + SIDE_MARGIN, HEIGHT + LOWER_MARGIN))
@@ -161,5 +189,16 @@ class Engine:
         self.level_editor.draw_text(f'User level: {self.level_editor.level}', WHITE, 10, HEIGHT + LOWER_MARGIN - 90)
         self.level_editor.draw_text('Press UP or DOWN to change level. Right-click to delete a block', WHITE, 10, HEIGHT + LOWER_MARGIN - 60)
         self.level_editor.user_input()
+
+        pygame.display.update()
+
+    def end(self):
+        self.screen.blit(self.end_img, (0, 0))
+        
+        if pygame.key.get_pressed()[pygame.K_r]:
+            pygame.mixer.music.load('ost/CPOR_BRASIL.mp3')
+            pygame.mixer.music.play(-1)
+            self.state = GameState.MENU
+            self.level_number = 1
 
         pygame.display.update()

@@ -1,6 +1,9 @@
 # GH == Grappling Hook
 # Todos os valores a seguir foram carteados
 
+HITPOINTS = {'x': (0, 0.5, 1),
+             'y': (0, 0.25, 0.5, 0.75, 1)}
+
 GH_MAX_LENGTH: float = 6.9
 GH_MAX_THRUST: float = 6.9
 
