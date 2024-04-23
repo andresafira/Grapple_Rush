@@ -83,10 +83,12 @@ class Level:
 
                 if xnew is not None:
                     new_x = xnew - x * 15
-                    player.gh_attached = True
+                    if player.gh_threw:
+                        player.gh_hit_wall = True
                 if ynew is not None:
                     new_y = ynew + y * 5
-                    player.gh_attached = True
+                    if player.gh_threw:
+                        player.gh_hit_wall = True
 
     def simulate_move_player(self, player: Player):
         keep_Xspeed, keep_Yspeed = True, True

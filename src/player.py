@@ -30,15 +30,17 @@ class Player:
 
         self.gh_position: Vector = Vector(x + width/1.5, y - height / 2)
         self.gh_velocity: Vector = Vector(0, 0)
+        self.gh_thrust = 0
 
         # reduce number of boolean
         self.gh_attached: bool = False
-        self.gh_approaching: bool = False
+        self.gh_returning: bool = False
         self.gh_holstered: bool = True
         self.gh_threw: bool = False
-        self.gh_surface = pygame.Surface((15, 5))
+        self.gh_hit_wall: bool = False
 
         self.space_key: bool = False
+        self.mouse_click: bool = False
 
         self.jumping: bool = True
         self.jump_pressing_ended: bool = False
@@ -64,62 +66,52 @@ class Player:
         _, _, _, screen_height = screen.get_rect()
         gh_distance = sqrt((self.position.x - self.gh_position.x) ** 2 + (self.position.y - self.gh_position.y) ** 2)
 
-        if self.space_key and not self.gh_holstered:
-            self.gh_attached = False
-            self.gh_holstered = True
-        self.space_key = False
+        # SELECT STATE
 
-        if self.gh_threw:
+        if self.gh_holstered and self.mouse_click:
             self.gh_holstered = False
-            self.gh_approaching = False
+            self.gh_threw = True
+            self.mouse_click = False
+
             mouse_position : Vector = Vector(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
             mouse_dist = sqrt((mouse_position.x - self.gh_position.x) ** 2 + (mouse_position.y - (screen_height - self.gh_position.y)) ** 2)
+
             self.gh_velocity.x = GRAPPLING_HOOK_SPEED * (mouse_position.x - self.gh_position.x) / mouse_dist
             self.gh_velocity.y = -GRAPPLING_HOOK_SPEED * (mouse_position.y - (screen_height - self.gh_position.y)) / mouse_dist
 
-        self.gh_threw = False
+        if self.gh_threw:
+            if gh_distance > GH_MAX_LENGTH:
+                self.gh_returning= True
+                self.gh_threw = False
+            if self.gh_hit_wall:
+                self.gh_attached = True
+                self.gh_threw = False
+                self.gh_hit_wall = False
 
+        if self.gh_attached and self.space_key:
+            self.gh_returning= True
+            self.gh_attached = False
+            self.space_key = False
 
-        if gh_distance > GH_MAX_LENGTH:
-            self.gh_approaching = True
-            self.gh_velocity.x = -self.gh_velocity.x
-            self.gh_velocity.y = -self.gh_velocity.y
+        if self.gh_attached and gh_distance < 100:
+            self.gh_returning= True
+            self.gh_attached = False
+            self.space_key = False
+
+        if self.gh_returning and gh_distance < GH_MIN_LENGTH:
+            self.gh_holstered = True
+            self.gh_returning = False
+
+        # Handle Selected State
+
+        if self.gh_returning:
+            self.gh_velocity.x = GRAPPLING_HOOK_SPEED * (self.position.x - self.gh_position.x) / gh_distance
+            self.gh_velocity.y = -GRAPPLING_HOOK_SPEED * (-self.position.y + self.gh_position.y) / gh_distance
 
         if self.gh_attached:
-
-            if gh_distance < GH_MIN_LENGTH:
-                self.gh_approaching = False
-
-                alpha =  pi / 2
-                if not self.gh_position.y == self.position.y:
-                    alpha = atan(abs((self.position.x - self.gh_position.x) / (self.gh_position.y - self.position.y)))
-
-                pendulum_velocity = sqrt(2 * abs(BASE_G_VALUE) * gh_distance * (1 - cos(alpha)))
-
-                if self.position.x > self.gh_position.x:
-                    self.velocity.x = -pendulum_velocity * cos(alpha)
-                    self.velocity.y = pendulum_velocity * sin(alpha)
-                else:
-                    self.velocity.x = pendulum_velocity * cos(alpha)
-                    self.velocity.y = pendulum_velocity * sin(alpha)
-
-                self.gh_velocity.x = 0
-                self.gh_velocity.y = 0
-                return
-
-            self.gh_approaching = True
-            if gh_distance == 0:
-                self.holstered = True
-                return
             self.velocity.x = -GRAPPLING_HOOK_SPEED * (self.position.x - self.gh_position.x) / gh_distance
             self.velocity.y = -GRAPPLING_HOOK_SPEED * (self.position.y - self.gh_position.y) / gh_distance
-            self.gh_velocity.x = 0
-            self.gh_velocity.y = 0
 
-        if self.gh_approaching and gh_distance < GH_MIN_LENGTH:
-            self.gh_holstered = True
-            self.gh_velocity.x = 0
-            self.gh_velocity.y = 0
 
     def change_sprite_state(self, new_state: SpriteState):
         if self.sprite_state == new_state:
@@ -139,6 +131,7 @@ class Player:
             target_speed = 0
         elif horizontal_movement == 'right':
             target_speed = MAX_HORIZONTAL_SPEED
+            self.gh_thrust = 100
 
         acc_x = ACC_KP * (target_speed - self.velocity.x)
         self.velocity.x += acc_x * self.dt

@@ -111,14 +111,20 @@ class Engine:
             jump = False
 
         # check for mouse click
-        prev_left_click = False
-        left_click = pygame.mouse.get_pressed()[0]
-        if left_click and not prev_left_click:
-            self.player.gh_holstered = False
-            self.player.gh_threw = True
-        prev_left_click = left_click
 
-        if keys[pygame.K_SPACE]:
+        #prev_left_click = False
+        #left_click = pygame.mouse.get_pressed()[0]
+
+        #if left_click and not prev_left_click:
+        #    self.player.mouse_click = True
+        #prev_left_click = left_click
+
+        if pygame.mouse.get_pressed()[0]:
+            self.player.mouse_click = True
+        else:
+            self.player.mouse_click = False
+
+        if keys[pygame.K_SPACE] & self.player.gh_attached:
            self.player.space_key = True
 
         self.player.update_velocity(horizontal_movement, jump)
