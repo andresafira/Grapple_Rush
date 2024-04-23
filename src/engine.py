@@ -96,14 +96,14 @@ class Engine:
 
     def draw_game(self):
         self.draw_background()
-        self.level.draw(self.screen, (0, 0))
-        self.player.draw(self.screen, (0, 0))
+        self.level.draw(self.screen)
+        self.player.draw(self.screen)
         # draw GH
 
     def menu(self):
         self.screen.blit(self.menu_img, (0, 0))
 
-        if any(pygame.key.get_pressed()):
+        if pygame.key.get_pressed()[pygame.K_p]:
             self.state = GameState.GAME
             self.elapsed_time = self.clock.get_time()
             self.elapsed_time = 0

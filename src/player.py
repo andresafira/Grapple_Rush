@@ -109,7 +109,7 @@ class Player:
     def move(self):
         self.position = self.position + self.velocity * self.dt
 
-    def draw(self, screen, anchor_point):
+    def draw(self, screen):
         _, _, _, screen_height = screen.get_rect()
 
         frame_speed = 4

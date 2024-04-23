@@ -2,21 +2,20 @@ from enum import Enum
 from typing import Union
 from player import Player
 from geometry.vector import Vector
-from constants.game_constants import TILE_HEIGHT, TILE_WIDTH, FPS, LEVELS_PATH, N_LEVELS, HEIGHT, WIDTH, PIXEL_CORRECTION
+from constants.game_constants import TILE_HEIGHT, TILE_WIDTH, FPS, LEVELS_PATH, N_LEVELS, HEIGHT, WIDTH, PIXEL_CORRECTION, TILES_NUM
 import pygame
 import json
 
 
-class Tile(Enum):
-    EMPTY = 0
-    WALL = 1
-    GROUND = 2
-    # include other tile types
-
-
 class Level:
     def __init__(self):
-        self.map: list[list[Tile]] = [[]]
+        self.map: list[list[int]] = [[]]
+        self.tiles_list = []
+
+        for tile_number in range(TILES_NUM):
+            img = pygame.image.load(f'tiles/{tile_number}.png')
+            img = pygame.transform.scale(img, (TILE_WIDTH, TILE_HEIGHT))
+            self.tiles_list.append(img)
 
     def create(self, level_number: int):
         if level_number < 1 or level_number > N_LEVELS:
@@ -95,12 +94,9 @@ class Level:
                 player.jumping = False
             player.velocity.y = 0
     
-    def draw(self, screen, anchor_point: tuple[float, float]):
-        _, _, _, screen_height = screen.get_rect()
-        for i in range(len(self.map)):
-            for j in range(len(self.map[0])):
-                if self.map[i][j] != 1:
-                    continue
-                pygame.draw.rect(screen, (0, 255, 0),
-                    (j*TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT))
+    def draw(self, screen):
+        for row_number, row in enumerate(self.map):
+            for index, tile in enumerate(row):
+                if tile != -1:
+                    screen.blit(self.tiles_list[tile], (index * TILE_WIDTH, row_number * TILE_HEIGHT))
 

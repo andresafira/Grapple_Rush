@@ -1,7 +1,7 @@
-from constants.game_constants import WIDTH, HEIGHT, ROWS, COLS, TILE_WIDTH, TILE_HEIGHT, SIDE_MARGIN, LOWER_MARGIN, TILES_NUM, GREEN, RED
+from constants.game_constants import WIDTH, HEIGHT, ROWS, COLS, TILE_WIDTH, TILE_HEIGHT, SIDE_MARGIN, LOWER_MARGIN, TILES_NUM, GREEN, RED, LEVELS_PATH
 from button import Button
 import pygame
-import pickle
+import json
 
 
 class Editor:
@@ -42,14 +42,18 @@ class Editor:
             self.map_info[ROWS - 1][tile] = 0
 
     def save_map(self):
-        pickle_out = open(f'user_levels/user_level_{self.level}', 'wb')
-        pickle.dump(self.map_info, pickle_out)
-        pickle_out.close()
+        level_path = LEVELS_PATH + f'l{self.level}.json'
+
+        with open(level_path, 'w') as file:
+            json.dump(self.map_info, file)
 
     def load_map(self):
         self.map_info = []
-        pickle_in = open(f'user_levels/user_level_{self.level}', 'rb')
-        self.map_info = pickle.load(pickle_in)
+
+        level_path = LEVELS_PATH + f'l{self.level}.json'
+
+        with open(level_path, 'r') as file:
+            self.map_info = json.load(file)
 
     def user_input(self):
         self.mouse_pos = pygame.mouse.get_pos()
