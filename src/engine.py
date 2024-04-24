@@ -64,8 +64,7 @@ class Engine:
 
         self.elapsed_time: float = 0.0
 
-        pygame.mixer.music.load('ost/CPOR_BRASIL.mp3')
-        pygame.mixer.music.play(-1)
+        self.apply_music()
 
     def run(self):
         running = True
@@ -73,7 +72,7 @@ class Engine:
             self.clock.tick(FPS)
 
             for event in pygame.event.get():
-                if event.type == pygame.QUIT or pygame.key.get_pressed()[K_ESCAPE]:
+                if event.type == pygame.QUIT:
                     running = False
                     break
 
@@ -112,23 +111,35 @@ class Engine:
         self.player.draw(self.screen)
         # draw GH
 
+    def apply_music(self):
+        if self.state == GameState.MENU:
+            pygame.mixer.music.load('ost/CPOR_BRASIL.mp3')
+        elif self.state == GameState.GAME:
+            pygame.mixer.music.load('ost/apotechary.mp3')
+        elif self.state == GameState.EDITOR:
+            pygame.mixer.music.load('ost/wave.mp3')
+        elif self.state == GameState.END:
+            pygame.mixer.music.load('ost/sunshine.mp3')
+        else:
+            raise Exception('Invalid game state')
+
+        pygame.mixer.music.play(-1)
+
     def menu(self):
         self.screen.blit(self.menu_img, (0, 0))
 
         if self.play_button.draw(self.screen):
+            self.level_number = 1
             pygame.time.wait(200)
-            pygame.mixer.music.load('ost/apotechary.mp3')
-            pygame.mixer.music.play(-1)
 
             self.elapsed_time = self.clock.get_time()
             self.elapsed_time = 0
 
             self.state = GameState.GAME
+            self.apply_music()
         if self.editor_button.draw(self.screen):
-            pygame.mixer.music.load('ost/wave.mp3')
-            pygame.mixer.music.play(-1)
-
             self.state = GameState.EDITOR
+            self.apply_music()
 
         pygame.display.update()
 
@@ -137,6 +148,11 @@ class Engine:
 
     def game(self):
         keys = pygame.key.get_pressed()
+        
+        if keys[pygame.K_ESCAPE]:
+            self.state = GameState.MENU
+            self.apply_music()
+
         horizontal_movement = 'none'
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             horizontal_movement = 'right'
@@ -150,21 +166,12 @@ class Engine:
         else:
             jump = False
 
-        # check for mouse click
-
-        #prev_left_click = False
-        #left_click = pygame.mouse.get_pressed()[0]
-
-        #if left_click and not prev_left_click:
-        #    self.player.mouse_click = True
-        #prev_left_click = left_click
-
         if pygame.mouse.get_pressed()[0]:
             self.player.mouse_click = True
         else:
             self.player.mouse_click = False
 
-        if keys[pygame.K_SPACE] & self.player.gh_attached:
+        if keys[pygame.K_SPACE] and self.player.gh_attached:
            self.player.space_key = True
 
         self.player.update_velocity(horizontal_movement, jump)
@@ -184,9 +191,8 @@ class Engine:
             self.restart_player()
             self.level_number += 1
             if self.level_number > N_LEVELS:
-                pygame.mixer.music.load('ost/sunshine.mp3')
-                pygame.mixer.music.play(-1)
                 self.state = GameState.END
+                self.apply_music()
             else:
                 self.level.create(self.level_number)
 
@@ -215,21 +221,17 @@ class Engine:
         self.level_editor.draw_text('Press UP or DOWN to change level. Right-click to delete a block', WHITE, 10, HEIGHT + LOWER_MARGIN - 60)
         self.level_editor.user_input()
         if self.editor_menu_button.draw(self.screen):
-            pygame.mixer.music.load('ost/CPOR_BRASIL.mp3')
-            pygame.mixer.music.play(-1)
             self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
             self.resized = False
             self.state = GameState.MENU
-            self.level_number = 1
+            self.apply_music()
 
         pygame.display.update()
 
     def end(self):
         self.screen.blit(self.end_img, (0, 0))        
         if self.menu_button.draw(self.screen):
-            pygame.mixer.music.load('ost/CPOR_BRASIL.mp3')
-            pygame.mixer.music.play(-1)
             self.state = GameState.MENU
-            self.level_number = 1
+            self.apply_music()
 
         pygame.display.update()

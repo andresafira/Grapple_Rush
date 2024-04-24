@@ -93,7 +93,7 @@ class Player:
             self.gh_attached = False
             self.space_key = False
 
-        if self.gh_attached and gh_distance < 100:
+        if self.gh_attached and gh_distance < 50:
             self.gh_returning= True
             self.gh_attached = False
             self.space_key = False
@@ -114,6 +114,8 @@ class Player:
             self.velocity.y = -GRAPPLING_HOOK_SPEED * (self.position.y-self.height/2 - self.gh_position.y) / gh_distance
             if self.velocity.abs() > 500:
                 self.velocity = self.velocity.normalize(490)
+
+        print(self.gh_attached, self.gh_returning, self.gh_holstered, self.gh_hit_wall, self.gh_threw, self.space_key)
 
 
     def change_sprite_state(self, new_state: SpriteState):
