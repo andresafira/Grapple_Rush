@@ -4,8 +4,10 @@
 HITPOINTS = {'x': (0, 0.5, 1),
              'y': (0, 0.25, 0.5, 0.75, 1)}
 
-GH_MAX_LENGTH: float = 6.9
-GH_MAX_THRUST: float = 6.9
+GH_MAX_LENGTH: float = 500
+GH_MIN_LENGTH: float = 30
+
+GRAPPLING_HOOK_SPEED: float = 600
 
 PLAYER_WIDTH: int = 30
 PLAYER_HEIGHT: int = 60

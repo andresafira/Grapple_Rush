@@ -37,7 +37,6 @@ class Engine:
         self.level: Union[None, Level] = Level()
         self.level_editor = Editor(self.screen)
         self.clock = pygame.time.Clock()
-        
         self.level.create(level_number = self.level_number)
         self.player: Union[None, Player] = Player(100, HEIGHT - 100, PLAYER_WIDTH, PLAYER_HEIGHT)
 
@@ -63,12 +62,6 @@ class Engine:
         self.editor_menu_button = Button(WIDTH // 2 + 460, HEIGHT + LOWER_MARGIN - 70, pygame.image.load(
             'buttons/menu_btn.jpg').convert_alpha(), 0.25)
 
-        #self.game_button_img = pygame.image.load('background/game_button.png').convert_alpha() 
-        #self.options_button_img = pygame.image.load('background/options_button.png').convert_alpha()
-
-        #self.game_button = Button(MENU_GAME_X, MENU_GAME_Y, self.game_button_img, 1)
-        #self.options_button = Button(MENU_OPTIONS_X, MENU_OPTIONS_Y, self.options_button_img, 1)
-        
         self.elapsed_time: float = 0.0
 
         pygame.mixer.music.load('ost/CPOR_BRASIL.mp3')
@@ -78,12 +71,12 @@ class Engine:
         running = True
         while running:
             self.clock.tick(FPS)
-            
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or pygame.key.get_pressed()[K_ESCAPE]:
                     running = False
                     break
-            
+
             if self.state == GameState.MENU:
                 self.menu()
             elif self.state == GameState.GAME:
@@ -96,7 +89,7 @@ class Engine:
                 raise Exception(f"Invalid Game State: {self.state}")
 
         pygame.quit()
-    
+
     def draw_background(self):
         self.screen.fill(GREEN)
         width = self.sky_img.get_width()
@@ -156,16 +149,33 @@ class Engine:
         else:
             jump = False
 
+        # check for mouse click
+
+        #prev_left_click = False
+        #left_click = pygame.mouse.get_pressed()[0]
+
+        #if left_click and not prev_left_click:
+        #    self.player.mouse_click = True
+        #prev_left_click = left_click
+
+        if pygame.mouse.get_pressed()[0]:
+            self.player.mouse_click = True
+        else:
+            self.player.mouse_click = False
+
+        if keys[pygame.K_SPACE] & self.player.gh_attached:
+           self.player.space_key = True
+
         self.player.update_velocity(horizontal_movement, jump)
+        self.player.update_gh_aim(self.screen) # change function name and divide it in smaller functions
         self.level.simulate_move_player(self.player)
+        self.level.simulate_move_gh(self.player)
         self.player.move()
 
         level_finished = self.level.update_player_state(self.player)
-        
         self.draw_game()
         self.draw_timer()
         pygame.display.update()
-        
         if not self.player.alive:
             self.restart_player()
 
@@ -186,7 +196,7 @@ class Engine:
         minutes: int = int(current_time_s // 60)
         seconds: int = int(current_time_s - minutes * 60)
         timer: str = '{:0>2}:{:0>2}'.format(minutes, seconds)
-        
+
         text_img = self.text_font.render(timer, True, BLACK)
         self.screen.blit(text_img, (10, 10))
 
@@ -211,8 +221,7 @@ class Engine:
         pygame.display.update()
 
     def end(self):
-        self.screen.blit(self.end_img, (0, 0))
-        
+        self.screen.blit(self.end_img, (0, 0))        
         if self.menu_button.draw(self.screen):
             pygame.mixer.music.load('ost/CPOR_BRASIL.mp3')
             pygame.mixer.music.play(-1)
