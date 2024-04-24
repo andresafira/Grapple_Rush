@@ -135,9 +135,7 @@ class Engine:
             pygame.mixer.music.play(-1)
 
             self.state = GameState.EDITOR
-
-        #if self.game_button.draw(self.screen):
-        #    self.state = GameState.GAME
+            
         pygame.display.update()
 
     def restart_player(self):
