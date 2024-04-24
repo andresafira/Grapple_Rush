@@ -115,9 +115,6 @@ class Player:
             if self.velocity.abs() > 500:
                 self.velocity = self.velocity.normalize(490)
 
-        print(self.gh_attached, self.gh_returning, self.gh_holstered, self.gh_hit_wall, self.gh_threw, self.space_key)
-
-
     def change_sprite_state(self, new_state: SpriteState):
         if self.sprite_state == new_state:
             return

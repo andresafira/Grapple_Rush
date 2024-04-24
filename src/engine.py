@@ -4,7 +4,7 @@ from typing import Union
 from level import Level
 from player import Player
 from editor import Editor
-from constants.game_constants import FPS, WIDTH, HEIGHT, SIDE_MARGIN, LOWER_MARGIN, GREEN, WHITE, BLACK, N_LEVELS
+from constants.game_constants import FPS, WIDTH, HEIGHT, SIDE_MARGIN, LOWER_MARGIN, GREEN, WHITE, RED, BLACK, N_LEVELS
 from constants.player_constants import PLAYER_WIDTH, PLAYER_HEIGHT
 
 # pygame libraries management
@@ -196,15 +196,16 @@ class Engine:
             else:
                 self.level.create(self.level_number)
 
-    def draw_timer(self):
-        self.elapsed_time += self.clock.get_time()
+    def draw_timer(self, update=True, color=RED):
+        if update:
+            self.elapsed_time += self.clock.get_time()
 
         current_time_s = int(self.elapsed_time / 1000)
         minutes: int = int(current_time_s // 60)
         seconds: int = int(current_time_s - minutes * 60)
         timer: str = '{:0>2}:{:0>2}'.format(minutes, seconds)
 
-        text_img = self.text_font.render(timer, True, BLACK)
+        text_img = self.text_font.render(timer, True, color)
         self.screen.blit(text_img, (10, 10))
 
     def editor(self):
@@ -233,5 +234,6 @@ class Engine:
         if self.menu_button.draw(self.screen):
             self.state = GameState.MENU
             self.apply_music()
+        self.draw_timer(update=False)
 
         pygame.display.update()
