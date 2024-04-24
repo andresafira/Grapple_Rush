@@ -61,15 +61,15 @@ class Level:
 
         keep_Xspeed, keep_Yspeed = True, True
         new_x, new_y = None, None
-        if not self.is_valid(i_next, j_next) or self.map[i_next][j_next] >= 0:
+        if not self.is_valid(i_next, j_next) or 0 <= self.map[i_next][j_next] < 9:
             i_current = int((HEIGHT - position.y) // TILE_HEIGHT)
             j_current = int(position.x // TILE_WIDTH)
 
             updated = False
-            if not self.is_valid(i_next, j_current) or self.map[i_next][j_current] >= 0:
+            if not self.is_valid(i_next, j_current) or 0 <= self.map[i_next][j_current] < 9:
                 keep_Yspeed = False
                 updated = True
-            if not self.is_valid(i_current, j_next) or self.map[i_current][j_next] >= 0:
+            if not self.is_valid(i_current, j_next) or 0 <= self.map[i_current][j_next] < 9:
                 keep_Xspeed = False
                 updated = True
 
