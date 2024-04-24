@@ -130,6 +130,8 @@ class Engine:
 
         if self.play_button.draw(self.screen):
             self.level_number = 1
+            self.level.create(self.level_number)
+            self.restart_player()
             pygame.time.wait(200)
 
             self.elapsed_time = self.clock.get_time()
