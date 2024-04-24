@@ -58,9 +58,9 @@ class Engine:
             'buttons/play_btn.jpg').convert_alpha(), 0.3)
         self.editor_button = Button(WIDTH // 2 - 30, HEIGHT - 100, pygame.image.load(
             'buttons/edit_level_btn.jpg').convert_alpha(), 0.3)
-        self.menu_button = Button(WIDTH // 2 - 30, HEIGHT - 250, pygame.image.load(
+        self.menu_button = Button(WIDTH - 150, HEIGHT - 100, pygame.image.load(
             'buttons/menu_btn.jpg').convert_alpha(), 0.3)
-        self.editor_menu_button = Button(WIDTH // 2 + 460, HEIGHT + LOWER_MARGIN - 50, pygame.image.load(
+        self.editor_menu_button = Button(WIDTH // 2 + 460, HEIGHT + LOWER_MARGIN - 70, pygame.image.load(
             'buttons/menu_btn.jpg').convert_alpha(), 0.25)
 
         #self.game_button_img = pygame.image.load('background/game_button.png').convert_alpha() 
@@ -135,7 +135,7 @@ class Engine:
             pygame.mixer.music.play(-1)
 
             self.state = GameState.EDITOR
-            
+
         pygame.display.update()
 
     def restart_player(self):

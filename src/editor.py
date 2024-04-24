@@ -17,10 +17,10 @@ class Editor:
         self.screen = game_screen
         self.mouse_pos = pygame.mouse.get_pos()
 
-        self.save_button = Button(WIDTH // 2 + 60, HEIGHT + LOWER_MARGIN - 50, pygame.image.load(
-            'buttons/save_btn.png').convert_alpha(), 1)
-        self.load_button = Button(WIDTH // 2 + 260, HEIGHT + LOWER_MARGIN - 50, pygame.image.load(
-            'buttons/load_btn.png').convert_alpha(), 1)
+        self.save_button = Button(WIDTH // 2 + 60, HEIGHT + LOWER_MARGIN - 70, pygame.image.load(
+            'buttons/save_btn.jpg').convert_alpha(), 0.25)
+        self.load_button = Button(WIDTH // 2 + 260, HEIGHT + LOWER_MARGIN - 70, pygame.image.load(
+            'buttons/load_btn.jpg').convert_alpha(), 0.25)
 
     def draw_text(self, text, color, x, y):
         image = self.text_font.render(text, True, color)
