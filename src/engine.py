@@ -53,11 +53,15 @@ class Engine:
 
         self.text_font = pygame.font.SysFont('Futura', 30)
 
-        #self.game_button_img = pygame.image.load('background/game_button.png').convert_alpha()
-        #self.options_button_img = pygame.image.load('background/options_button.png').convert_alpha()
+        self.play_button = Button(WIDTH // 2 - 30, HEIGHT - 200, pygame.image.load(
+            'buttons/play_btn.jpg').convert_alpha(), 0.3)
+        self.editor_button = Button(WIDTH // 2 - 30, HEIGHT - 100, pygame.image.load(
+            'buttons/edit_level_btn.jpg').convert_alpha(), 0.3)
+        self.menu_button = Button(WIDTH - 150, HEIGHT - 100, pygame.image.load(
+            'buttons/menu_btn.jpg').convert_alpha(), 0.3)
+        self.editor_menu_button = Button(WIDTH // 2 + 460, HEIGHT + LOWER_MARGIN - 70, pygame.image.load(
+            'buttons/menu_btn.jpg').convert_alpha(), 0.25)
 
-        #self.game_button = Button(MENU_GAME_X, MENU_GAME_Y, self.game_button_img, 1)
-        #self.options_button = Button(MENU_OPTIONS_X, MENU_OPTIONS_Y, self.options_button_img, 1)
         self.elapsed_time: float = 0.0
 
         pygame.mixer.music.load('ost/CPOR_BRASIL.mp3')
@@ -111,15 +115,20 @@ class Engine:
     def menu(self):
         self.screen.blit(self.menu_img, (0, 0))
 
-        if pygame.key.get_pressed()[pygame.K_p]:
+        if self.play_button.draw(self.screen):
             pygame.mixer.music.load('ost/karla.mp3')
             pygame.mixer.music.play(-1)
-            self.state = GameState.GAME
+
             self.elapsed_time = self.clock.get_time()
             self.elapsed_time = 0
 
-        #if self.game_button.draw(self.screen):
-        #    self.state = GameState.GAME
+            self.state = GameState.GAME
+        if self.editor_button.draw(self.screen):
+            pygame.mixer.music.load('ost/karla.mp3')
+            pygame.mixer.music.play(-1)
+
+            self.state = GameState.EDITOR
+
         pygame.display.update()
 
     def restart_player(self):
@@ -204,13 +213,16 @@ class Engine:
         self.level_editor.draw_text(f'User level: {self.level_editor.level}', WHITE, 10, HEIGHT + LOWER_MARGIN - 90)
         self.level_editor.draw_text('Press UP or DOWN to change level. Right-click to delete a block', WHITE, 10, HEIGHT + LOWER_MARGIN - 60)
         self.level_editor.user_input()
+        if self.editor_menu_button.draw(self.screen):
+            self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+            self.resized = False
+            self.state = GameState.MENU
 
         pygame.display.update()
 
     def end(self):
-        self.screen.blit(self.end_img, (0, 0))
-
-        if pygame.key.get_pressed()[pygame.K_r]:
+        self.screen.blit(self.end_img, (0, 0))        
+        if self.menu_button.draw(self.screen):
             pygame.mixer.music.load('ost/CPOR_BRASIL.mp3')
             pygame.mixer.music.play(-1)
             self.state = GameState.MENU
