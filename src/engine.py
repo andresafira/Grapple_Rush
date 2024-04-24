@@ -38,7 +38,7 @@ class Engine:
         self.level_editor = Editor(self.screen)
         self.clock = pygame.time.Clock()
         self.level.create(level_number = self.level_number)
-        self.player: Union[None, Player] = Player(100, HEIGHT - 100, PLAYER_WIDTH, PLAYER_HEIGHT)
+        self.player: Union[None, Player] = Player(20, 130, PLAYER_WIDTH, PLAYER_HEIGHT)
 
         self.pine1_img = pygame.image.load('background/pine1.png').convert_alpha()
         self.pine2_img = pygame.image.load('background/pine2.png').convert_alpha()
@@ -116,7 +116,8 @@ class Engine:
         self.screen.blit(self.menu_img, (0, 0))
 
         if self.play_button.draw(self.screen):
-            pygame.mixer.music.load('ost/karla.mp3')
+            pygame.time.wait(200)
+            pygame.mixer.music.load('ost/apotechary.mp3')
             pygame.mixer.music.play(-1)
 
             self.elapsed_time = self.clock.get_time()
@@ -124,7 +125,7 @@ class Engine:
 
             self.state = GameState.GAME
         if self.editor_button.draw(self.screen):
-            pygame.mixer.music.load('ost/karla.mp3')
+            pygame.mixer.music.load('ost/wave.mp3')
             pygame.mixer.music.play(-1)
 
             self.state = GameState.EDITOR
@@ -132,7 +133,7 @@ class Engine:
         pygame.display.update()
 
     def restart_player(self):
-        self.player = Player(50, HEIGHT - 50, PLAYER_WIDTH, PLAYER_HEIGHT)
+        self.player = Player(20, 130, PLAYER_WIDTH, PLAYER_HEIGHT)
 
     def game(self):
         keys = pygame.key.get_pressed()
@@ -214,9 +215,12 @@ class Engine:
         self.level_editor.draw_text('Press UP or DOWN to change level. Right-click to delete a block', WHITE, 10, HEIGHT + LOWER_MARGIN - 60)
         self.level_editor.user_input()
         if self.editor_menu_button.draw(self.screen):
+            pygame.mixer.music.load('ost/CPOR_BRASIL.mp3')
+            pygame.mixer.music.play(-1)
             self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
             self.resized = False
             self.state = GameState.MENU
+            self.level_number = 1
 
         pygame.display.update()
 

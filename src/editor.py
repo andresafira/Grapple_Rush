@@ -6,7 +6,7 @@ import json
 
 class Editor:
     def __init__(self, game_screen):
-        self.level = N_LEVELS + 1
+        self.level = 1
         self.text_font = pygame.font.SysFont('Futura', 30)
         self.initialized = -1
         self.tiles_list = []
@@ -72,7 +72,7 @@ class Editor:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     self.level += 1
-                if event.key == pygame.K_DOWN and self.level > N_LEVELS + 1:
+                if event.key == pygame.K_DOWN and self.level > 1:
                     self.level -= 1
 
     def draw_map(self):

@@ -3,7 +3,7 @@ from typing import Union
 from player import Player
 from geometry.vector import Vector
 
-from constants.game_constants import TILE_HEIGHT, TILE_WIDTH, FPS, LEVELS_PATH, N_LEVELS, HEIGHT, WIDTH, PIXEL_CORRECTION, TILES_NUM
+from constants.game_constants import TILE_HEIGHT, TILE_WIDTH, FPS, LEVELS_PATH, N_LEVELS, HEIGHT, WIDTH, PIXEL_CORRECTION, TILES_NUM, ROWS, COLS
 from constants.player_constants import HITPOINTS
 
 import pygame
@@ -45,7 +45,7 @@ class Level:
                 # water kills you
                 if self.map[i_pos][j_pos] == 9 or self.map[i_pos][j_pos] == 10:
                     player.alive = False
-                elif self.map[i_pos][j_pos] == -2: # goal flag
+                elif pos_x > TILE_WIDTH * (COLS - 1) + TILE_WIDTH / 1.1: # goal flag
                     completed_level = True
 
         return completed_level

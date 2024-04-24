@@ -28,7 +28,7 @@ class Player:
         self.height = height
         self.width = width
 
-        self.gh_position: Vector = Vector(x + width/1.5, y - height / 2)
+        self.gh_position: Vector = Vector(x + width/2, y - height / 2)
         self.gh_velocity: Vector = Vector(0, 0)
         self.gh_thrust = 0
 
@@ -64,7 +64,7 @@ class Player:
 
     def update_gh_aim(self, screen):
         _, _, _, screen_height = screen.get_rect()
-        gh_distance = sqrt((self.position.x - self.gh_position.x) ** 2 + (self.position.y - self.gh_position.y) ** 2)
+        gh_distance = sqrt((self.position.x + self.width/2 - self.gh_position.x) ** 2 + (self.position.y - self.height/2 - self.gh_position.y) ** 2)
 
         # SELECT STATE
 
@@ -99,18 +99,21 @@ class Player:
             self.space_key = False
 
         if self.gh_returning and gh_distance < GH_MIN_LENGTH:
+            self.gh_position = self.position + Vector(self.width / 2, -self.height / 2)
             self.gh_holstered = True
             self.gh_returning = False
 
         # Handle Selected State
 
         if self.gh_returning:
-            self.gh_velocity.x = GRAPPLING_HOOK_SPEED * (self.position.x - self.gh_position.x) / gh_distance
-            self.gh_velocity.y = -GRAPPLING_HOOK_SPEED * (-self.position.y + self.gh_position.y) / gh_distance
+            self.gh_velocity.x = GRAPPLING_HOOK_SPEED * (self.position.x + self.width/2 - self.gh_position.x) / gh_distance
+            self.gh_velocity.y = -GRAPPLING_HOOK_SPEED * (-self.position.y + self.height/2 + self.gh_position.y) / gh_distance
 
         if self.gh_attached:
-            self.velocity.x = -GRAPPLING_HOOK_SPEED * (self.position.x - self.gh_position.x) / gh_distance
-            self.velocity.y = -GRAPPLING_HOOK_SPEED * (self.position.y - self.gh_position.y) / gh_distance
+            self.velocity.x = -GRAPPLING_HOOK_SPEED * (self.position.x+self.width/2 - self.gh_position.x) / gh_distance
+            self.velocity.y = -GRAPPLING_HOOK_SPEED * (self.position.y-self.height/2 - self.gh_position.y) / gh_distance
+            if self.velocity.abs() > 500:
+                self.velocity = self.velocity.normalize(490)
 
 
     def change_sprite_state(self, new_state: SpriteState):
@@ -170,18 +173,19 @@ class Player:
         self.velocity.y += acc_y * self.dt
 
     def move(self):
-        if self.gh_attached:
-            self.position = self.position + self.velocity * self.dt
-        else:
-            self.position = self.position + self.velocity * self.dt
-            if self.gh_holstered:
-                self.gh_position.x = self.position.x
-                self.gh_position.y = self.position.y
-            self.gh_position = self.gh_position + self.gh_velocity * self.dt + self.velocity * self.dt
+        self.position = self.position + self.velocity * self.dt
+        if self.gh_holstered:
+            self.gh_velocity = Vector(0, 0)
+            self.gh_position.x = self.position.x + self.width / 2
+            self.gh_position.y = self.position.y - self.height / 2
+        if not self.gh_attached:
+            self.gh_position = self.gh_position + self.gh_velocity * self.dt #+ self.velocity * self.dt
 
     def draw(self, screen):
         _, _, _, screen_height = screen.get_rect()
 
+        pygame.draw.line(screen, (255, 255, 255), (self.position.x + self.width / 2, screen_height - self.position.y + self.height/2),(self.gh_position.x, screen_height - self.gh_position.y))
+        pygame.draw.circle(screen, (0, 0, 0), (self.gh_position.x, screen_height - self.gh_position.y), 5)
 
         frame_speed = 4
         self.frame_count += 1
@@ -193,6 +197,3 @@ class Player:
                 self.sprite_count = 0
         sprite = flip(self.sprites[self.sprite_state][self.sprite_count], flip_x = self.flip_sprite, flip_y = False)
         screen.blit(sprite, (self.position.x, screen_height - self.position.y, self.width, self.height))
-
-        pygame.draw.circle(screen, (0, 0, 0), (self.gh_position.x, screen_height - self.gh_position.y), 5)
-        pygame.draw.line(screen, (255, 255, 255), (self.position.x, screen_height - self.position.y),(self.gh_position.x, screen_height - self.gh_position.y))

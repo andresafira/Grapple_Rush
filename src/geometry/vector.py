@@ -36,4 +36,4 @@ class Vector:
     def normalize(self, new_mod: float = 1):
         if self.abs() < 0.001:
             return self
-        return self / self.abs() * new_mod
+        return self * (new_mod / self.abs())
